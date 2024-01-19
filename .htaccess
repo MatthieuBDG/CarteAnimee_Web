@@ -1,0 +1,21 @@
+
+RewriteEngine on
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^/]+)/?$ $1.php [L]
+
+
+ErrorDocument 300 /error/300
+ErrorDocument 301 /error/300
+ErrorDocument 400 /error/404
+ErrorDocument 401 /error/404
+ErrorDocument 403 /error/404
+ErrorDocument 404 /error/404
+ErrorDocument 500 /error/500
+ErrorDocument 501 /error/500
+ErrorDocument 502 /error/500
+ErrorDocument 503 /error/500
+ErrorDocument 504 /error/500
+ErrorDocument 505 /error/500*
