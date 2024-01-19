@@ -1,44 +1,45 @@
 <?php
 require 'include/connexion_bdd.php';
-
+$roles = $dbh->prepare('SELECT * FROM roles');
+$roles->execute(array());
 if (isset($_POST['submit'])) {
     $nom = htmlspecialchars($_POST['nom']);
     $prenom = htmlspecialchars($_POST['prenom']);
     $email = htmlspecialchars($_POST['email']);
     $mdp = htmlspecialchars($_POST['mdp']);
     $mdpconfirm = htmlspecialchars($_POST['mdpconfirm']);
+    $role = htmlspecialchars($_POST['role']);
     $vemail = '@';
     $vespace  = ' ';
     $espace = strpos($prenom, $vespace);
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         if ($espace === false) {
-            if (!empty($nom) && isset($nom) || !empty($prenom) && isset($prenom) || !empty($email) && isset($email)  || !empty($mdp) && isset($mdp) || !empty($mdpconfirm) && isset($mdpconfirm)) {
+            if (!empty($nom) && isset($nom) || !empty($prenom) && isset($prenom) || !empty($email) && isset($email)  || !empty($mdp) && isset($mdp) || !empty($mdpconfirm) && isset($mdpconfirm)|| !empty($role) && isset($role)) {
                 if ($mdp == $mdpconfirm) {
                     if (strlen($mdp) >= 8) {
                         $mailexist = $dbh->prepare('SELECT ID_User FROM users WHERE Email = ?');
                         $mailexist->execute(array($email));
                         if ($mailexist->rowCount() == 0) {
-                            $role = 1;
                             $passwordhash = password_hash($mdp, PASSWORD_DEFAULT);
                             $insertnewuser = $dbh->prepare('INSERT INTO users(Prenom,Nom,Email,Mdp,Role) VALUES (?,?,?,?,?)');
                             $insertnewuser->execute(array($prenom, $nom, $email, $passwordhash, $role));
                         } else {
-                            $erreur = "<h3>L'adresse mail est déja utilisé</h3>";
+                            $erreur = "L'adresse mail est déja utilisé";
                         }
                     } else {
                         $erreur = "Le mot de passe doit faire minimum 8 caractères";
                     }
                 } else {
-                    $erreur = "Les deux mots de passe ne correspondent pas !";
+                    $erreur = "Les deux mots de passe ne correspondent pas";
                 }
             } else {
-                $erreur = "<h3>Tous les champs doivent être complétés !</h3>";
+                $erreur = "Tous les champs doivent être complétés";
             }
         } else {
-            $erreur = "<h3>Le champ pseudo ne doit pas contenir d'espaces !</h3>";
+            $erreur = "Le champ prénom ne doit pas contenir d'espaces";
         }
     } else {
-        $erreur = "<h3>Adresse mail invalide</h3>";
+        $erreur = "Adresse mail invalide";
     }
 }
 ?>
@@ -77,12 +78,21 @@ if (isset($_POST['submit'])) {
                             </div>
                             <div class="card-body">
                                 <?php
-                                if (isset($erreur)) {
-                                    echo '<font color="red">' . $erreur . "</font>";
-                                }
+                                if (isset($erreur)) { ?>
+                                    <div class="alert alert-danger" role="alert">
+                                        <?php echo $erreur ?>
+                                    </div>
+                                <?php }
                                 ?>
                                 <form method="post">
                                     <div class="row mb-3">
+                                        <div class="form-floating mb-3">
+                                            <select class="form-control" name="role" required>
+                                                <?php foreach ($roles as $role) { ?>
+                                                    <option value="<?php echo $role['ID_Role']; ?>"><?php echo $role['Nom']; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
                                         <div class="col-md-6">
                                             <div class="form-floating mb-3 mb-md-0">
                                                 <input class="form-control" type="text" name="prenom" placeholder="Entrer votre prénom" required />
