@@ -1,0 +1,2 @@
+Un patient a t-il le droit de ce connecter sur l'interface web ou uniquement sur le mobile / tablette ?
+Comment on peux faire pour avoir un serveur Web distante ? 

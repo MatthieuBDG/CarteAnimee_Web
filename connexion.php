@@ -7,28 +7,27 @@
 <?php
 require 'include/connexion_bdd.php';
 
-if (isset($_SESSION['ID_User'])) {
-    header('Location: ./deconnexion');
-}
 // Gestion des messages en fonction des paramètres GET
 if (isset($_GET['disconnect']) && !empty($_GET['disconnect']) && !isset($_SESSION['ID_User'])) {
     $message_warning = "Vous avez été déconnecté !";
 }
-/*
+
 if (isset($_GET['connect']) && !empty($_GET['connect']) && !isset($_SESSION['ID_User'])) {
     $message_info = "Vous devez être connecté !";
 }
+/*
 if (isset($_GET['error']) && !empty($_GET['error'])) {
     $message_warning = "Vous devez être connecté en tant qu'administrateur !";
 }
 */
 if (isset($_POST['submit'])) {
+
     $email = htmlspecialchars($_POST['email']);
     $mdp = htmlspecialchars($_POST['mdp']);
     if (!empty($email) && isset($email) || !empty($mdp) && isset($mdp)) {
         try {
-            $req_verif_existe_user = $dbh->prepare("SELECT * FROM users WHERE Email = ?");
-            $req_verif_existe_user->execute(array($email));
+            $req_verif_existe_user = $dbh->prepare("SELECT * FROM users WHERE Email = ? AND Role = ?");
+            $req_verif_existe_user->execute(array($email, 1));
             $resultat_verif_existe_user = $req_verif_existe_user->rowCount();
         } catch (PDOException $e) {
             echo "Erreur!: " . $e->getMessage() . "<br/>";
@@ -55,7 +54,8 @@ if (isset($_POST['submit'])) {
                 $_SESSION['Email'] = $resultat_user['Email'];
                 $_SESSION['ID_Role'] = $resultat_user['Role'];
                 $_SESSION['Role'] = $req_recup_role['Nom'];
-                header('Location: ./'); // Redirection vers la page d'accueil après connexion réussie
+                $success = 'Bienvenue ' . $resultat_user['Prenom'] . ' ' . $resultat_user['Nom'] . ' !';
+                header('Location: ./listeserie?message=' . $success);
             } else {
                 $erreur = "Email ou mot de passe incorrect";
             }
@@ -102,8 +102,11 @@ if (isset($_POST['submit'])) {
                             </div>
                             <div class="card-body">
 
-                                <?php if (isset($message_warning) && !isset($erreur)) { ?>
+                                <?php if (isset($message_warning) && !isset($message_info) && !isset($erreur)) { ?>
                                     <div class="alert alert-danger mb-3" role="alert"><?php echo $message_warning ?></div>
+                                <?php } ?>
+                                <?php if (isset($message_info) && !isset($message_warning) && !isset($erreur)) { ?>
+                                    <div class="alert alert-info mb-3" role="info"><?php echo $message_info ?></div>
                                 <?php } ?>
                                 <?php if (isset($erreur)) { ?>
                                     <div class="alert alert-danger" role="alert">
@@ -113,13 +116,15 @@ if (isset($_POST['submit'])) {
                                 ?>
                                 <form method="post">
                                     <div class="row mb-3">
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" name="email" type="email" placeholder="prenom.nom@gmail.com" required />
-                                            <label>Adresse Email</label>
-                                        </div>
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" name="mdp" type="password" placeholder="Mot de passe" required />
-                                            <label>Mot de passe</label>
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" name="email" type="email" placeholder="prenom.nom@gmail.com" required />
+                                                <label>Adresse Email</label>
+                                            </div>
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control" name="mdp" type="password" placeholder="Mot de passe" required />
+                                                <label>Mot de passe</label>
+                                            </div>
                                         </div>
                                         <div class="mt-4 mb-0">
                                             <input type="submit" name="submit" class="btn btn-primary" value="Connexion">
@@ -138,7 +143,7 @@ if (isset($_POST['submit'])) {
             ?>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
 </body>
 

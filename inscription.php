@@ -7,6 +7,8 @@
 <?php
 require 'include/connexion_bdd.php';
 
+require 'include/verif_user_connect.php';
+
 try {
     $roles = $dbh->prepare('SELECT * FROM roles');
     $roles->execute(array());
@@ -36,6 +38,7 @@ if (isset($_POST['submit'])) {
                             try {
                                 $insertnewuser = $dbh->prepare('INSERT INTO users(Prenom,Nom,Email,Mdp,Role) VALUES (?,?,?,?,?)');
                                 $insertnewuser->execute(array($prenom, $nom, $email, $passwordhash, $role));
+                                $success = "Le compte à bien été crée !";
                             } catch (PDOException $e) {
                                 echo "Erreur!: " . $e->getMessage() . "<br/>";
                                 die();
@@ -95,9 +98,16 @@ if (isset($_POST['submit'])) {
                             </div>
                             <div class="card-body">
                                 <?php
-                                if (isset($erreur)) { ?>
+                                if (isset($erreur) && !isset($success)) { ?>
                                     <div class="alert alert-danger" role="alert">
                                         <?php echo $erreur ?>
+                                    </div>
+                                <?php }
+                                ?>
+                                <?php
+                                if (isset($success) && !isset($erreur)) { ?>
+                                    <div class="alert alert-success" role="success">
+                                        <?php echo $success ?>
                                     </div>
                                 <?php }
                                 ?>
@@ -158,7 +168,7 @@ if (isset($_POST['submit'])) {
             ?>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
 </body>
 
