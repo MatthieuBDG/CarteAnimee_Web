@@ -34,8 +34,11 @@ require 'include/verif_user_connect.php';
                         <li class="breadcrumb-item">Pages</li>
                         <li class="breadcrumb-item"><a href="listeserie">Liste des séries</li></a>
                     </ol>
-                    <?php if (isset($_GET['message'])) { ?>
+                    <?php if (isset($_GET['message']) && !isset($_GET['messageerror'])) { ?>
                         <div class="alert alert-success mb-3" role="success"><?php echo $_GET['message'] ?></div>
+                    <?php } ?>
+                    <?php if (isset($_GET['messageerror']) && !isset($_GET['message'])) { ?>
+                        <div class="alert alert-danger mb-3" role="danger"><?php echo $_GET['messageerror'] ?></div>
                     <?php } ?>
                     <div class="card mb-4">
                         <div class="card-body">
@@ -57,20 +60,33 @@ require 'include/verif_user_connect.php';
                                         while ($serie = $series->fetch()) {
                                             echo '<tr>';
                                             echo '<td>' . $serie['Nom'] . '</td>';
-                                            $series_user_autorise = $dbh->prepare('SELECT ID_User FROM autorisations WHERE ID_Serie = ?');
-                                            $series_user_autorise->execute(array($serie['ID_Serie']));
-                                            $series_user_autorise_count = $series_user_autorise->rowCount();
-                                            if ($series_user_autorise_count > 0) {
+                                            try {
+                                                $series_user_autorise = $dbh->prepare('SELECT ID_User FROM autorisations_series WHERE ID_Serie = ?');
+                                                $series_user_autorise->execute(array($serie['ID_Serie']));
+                                                $series_user_autorise_count = $series_user_autorise->rowCount();
+
                                                 echo '<td>';
-                                                while ($series_user_autorises = $series_user_autorise->fetch()) {
-                                                    $series_user = $dbh->prepare('SELECT Prenom,Nom FROM users WHERE ID_User = ?');
-                                                    $series_user->execute(array($series_user_autorises['ID_User']));
-                                                    $series_users = $series_user->fetch();
-                                                    echo '<li>' . $series_users['Prenom'] . ' ' . $series_users['Nom'] . '</li>';
+                                                if ($series_user_autorise_count > 0) {
+                                                    echo '<ul>'; // Ouvrir la liste
+                                                    while ($series_user_autorises = $series_user_autorise->fetch()) {
+                                                        try {
+                                                            $series_user = $dbh->prepare('SELECT Prenom, Nom FROM users WHERE ID_User = ?');
+                                                            $series_user->execute(array($series_user_autorises['ID_User']));
+                                                            $series_users = $series_user->fetch();
+                                                            echo '<li>' . $series_users['Prenom'] . ' ' . $series_users['Nom'] . '</li>';
+                                                        } catch (PDOException $e) {
+                                                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                            die();
+                                                        }
+                                                    }
+                                                    echo '</ul>'; // Fermer la liste
+                                                } else {
+                                                    echo 'Aucun enfant/parent autorisé';
                                                 }
                                                 echo '</td>';
-                                            } else {
-                                                echo '<td></td>';
+                                            } catch (PDOException $e) {
+                                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                die();
                                             }
                                             echo '<td>';
                                             echo '<a href="modifierserie?id_serie=' . $serie['ID_Serie'] . '" class="btn btn-primary btn-sm me-2">Modifier</a>';
@@ -83,6 +99,7 @@ require 'include/verif_user_connect.php';
                                         die();
                                     }
                                     ?>
+
                                 </tbody>
                             </table>
                         </div>

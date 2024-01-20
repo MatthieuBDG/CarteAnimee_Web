@@ -19,7 +19,7 @@ if (isset($_POST['submit'])) {
             try {
                 $insertnewserie = $dbh->prepare('INSERT INTO series(Nom) VALUES (?)');
                 $insertnewserie->execute(array($nomserie));
-                $success = "La série à bien été crée !";
+                $success = "La série $nomserie à bien été crée !";
                 header('Location: ./listeserie?message=' . $success);
         
             } catch (PDOException $e) {
@@ -70,16 +70,9 @@ if (isset($_POST['submit'])) {
                             </div>
                             <div class="card-body">
                                 <?php
-                                if (isset($erreur) && !isset($success)) { ?>
+                                if (isset($erreur)) { ?>
                                     <div class="alert alert-danger" role="alert">
                                         <?php echo $erreur ?>
-                                    </div>
-                                <?php }
-                                ?>
-                                <?php
-                                if (isset($success) && !isset($erreur)) { ?>
-                                    <div class="alert alert-success" role="success">
-                                        <?php echo $success ?>
                                     </div>
                                 <?php }
                                 ?>
