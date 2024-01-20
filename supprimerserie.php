@@ -32,6 +32,13 @@ if (isset($_POST['submit'])) {
         die();
     }
     try {
+        $deleteseries_animations = $dbh->prepare('DELETE FROM series_animations WHERE ID_Serie = ?');
+        $deleteseries_animations->execute(array($id_serie));
+    } catch (PDOException $e) {
+        echo "Erreur!: " . $e->getMessage() . "<br/>";
+        die();
+    }
+    try {
         $deleteserie = $dbh->prepare('DELETE FROM series WHERE ID_Serie = ?');
         $deleteserie->execute(array($id_serie));
     } catch (PDOException $e) {
@@ -85,47 +92,93 @@ if (isset($_POST['submit'])) {
                                     </div>
                                 <?php }
                                 ?>
-                                <form method="post">
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <div class="form-floating mb-3">
-                                                <input class="form-control" name="nomserie" type="text" placeholder="Animaux" value="<?php echo $series_infos['Nom'] ?>" disabled />
-                                                <label>Nom de la série</label>
-                                            </div>
-                                            <h4>Enfants/Parents autorisés : </h4>
-                                            <?php
-                                            try {
-                                                $series_user_autorise = $dbh->prepare('SELECT ID_User FROM autorisations_series WHERE ID_Serie = ?');
-                                                $series_user_autorise->execute(array($id_serie));
-                                                $series_user_autorise_count = $series_user_autorise->rowCount();
+                                <div class="card">
+                                    <div class="card-body">
+                                        <form method="post">
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        <input class="form-control" name="nomserie" type="text" placeholder="Animaux" value="<?php echo $series_infos['Nom'] ?>" disabled />
+                                                        <label>Nom de la série</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <h4>Enfants/Parents autorisés : </h4>
+                                                            <?php
+                                                            try {
+                                                                $series_user_autorise = $dbh->prepare('SELECT ID_User FROM autorisations_series WHERE ID_Serie = ?');
+                                                                $series_user_autorise->execute(array($id_serie));
+                                                                $series_user_autorise_count = $series_user_autorise->rowCount();
 
-                                                if ($series_user_autorise_count > 0) {
-                                                    echo '<ul>'; // Ouvrir la liste
-                                                    while ($series_user_autorises = $series_user_autorise->fetch()) {
-                                                        try {
-                                                            $series_user = $dbh->prepare('SELECT Prenom, Nom FROM users WHERE ID_User = ?');
-                                                            $series_user->execute(array($series_user_autorises['ID_User']));
-                                                            $series_users = $series_user->fetch();
-                                                            echo '<li>' . $series_users['Prenom'] . ' ' . $series_users['Nom'] . '</li>';
-                                                        } catch (PDOException $e) {
-                                                            echo "Erreur!: " . $e->getMessage() . "<br/>";
-                                                            die();
-                                                        }
-                                                    }
-                                                    echo '</ul>'; // Fermer la liste
-                                                } else {
-                                                    echo 'Aucun enfant/parent autorisé';
-                                                }
-                                            } catch (PDOException $e) {
-                                                echo "Erreur!: " . $e->getMessage() . "<br/>";
-                                                die();
-                                            }
-                                            ?>
-                                        </div>
-                                        <div class="mt-4 mb-0">
-                                            <input type="submit" name="submit" class="btn btn-danger" value="Supprimer">
-                                        </div>
-                                </form>
+                                                                if ($series_user_autorise_count > 0) {
+                                                                    echo '<ul>'; // Ouvrir la liste
+                                                                    while ($series_user_autorises = $series_user_autorise->fetch()) {
+                                                                        try {
+                                                                            $series_user = $dbh->prepare('SELECT Prenom, Nom FROM users WHERE ID_User = ?');
+                                                                            $series_user->execute(array($series_user_autorises['ID_User']));
+                                                                            $series_users = $series_user->fetch();
+                                                                            echo '<li>' . $series_users['Prenom'] . ' ' . $series_users['Nom'] . '</li>';
+                                                                        } catch (PDOException $e) {
+                                                                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                                            die();
+                                                                        }
+                                                                    }
+                                                                    echo '</ul>'; // Fermer la liste
+                                                                } else {
+                                                                    echo 'Aucun enfant/parent autorisé';
+                                                                }
+                                                            } catch (PDOException $e) {
+                                                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                                die();
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <h4>Animations associées : </h4>
+                                                            <?php
+                                                            try {
+                                                                $series_animation_associee = $dbh->prepare('SELECT ID_Animation FROM series_animations WHERE ID_Serie = ?');
+                                                                $series_animation_associee->execute(array($id_serie));
+                                                                $series_animation_associee_count = $series_animation_associee->rowCount();
+                                                                echo '<td>';
+                                                                if ($series_animation_associee_count > 0) {
+                                                                    echo '<ul>'; // Ouvrir la liste
+                                                                    while ($series_animation_associees = $series_animation_associee->fetch()) {
+                                                                        try {
+                                                                            $series_animation = $dbh->prepare('SELECT * FROM animations WHERE ID_Animation = ?');
+                                                                            $series_animation->execute(array($series_animation_associees['ID_Animation']));
+                                                                            $series_animations = $series_animation->fetch();
+                                                                            echo '<li>' . $series_animations['Nom'] . '</li>';
+                                                                        } catch (PDOException $e) {
+                                                                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                                            die();
+                                                                        }
+                                                                    }
+                                                                    echo '</ul>'; // Fermer la liste
+                                                                } else {
+                                                                    echo 'Aucune animation associées';
+                                                                }
+                                                                echo '</td>';
+                                                            } catch (PDOException $e) {
+                                                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                                die();
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-4 mb-0">
+                                                    <input type="submit" name="submit" class="btn btn-danger" value="Supprimer">
+                                                </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

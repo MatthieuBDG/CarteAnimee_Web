@@ -42,12 +42,13 @@ require 'include/verif_user_connect.php';
                     <?php } ?>
                     <div class="card mb-4">
                         <div class="card-body">
-                            <a href="ajoutserie.php" class="btn btn-primary mb-3">Ajouter une série</a>
+                            <a href="ajoutserie" class="btn btn-primary mb-3">Ajouter une série</a>
                             <table id="datatablesSimple">
                                 <thead>
                                     <tr>
                                         <th>Nom de série</th>
                                         <th>Enfants/Parents autorisés</th>
+                                        <th>Animations associées</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -82,6 +83,33 @@ require 'include/verif_user_connect.php';
                                                     echo '</ul>'; // Fermer la liste
                                                 } else {
                                                     echo 'Aucun enfant/parent autorisé';
+                                                }
+                                                echo '</td>';
+                                            } catch (PDOException $e) {
+                                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                die();
+                                            }
+                                            try {
+                                                $series_animation_associee = $dbh->prepare('SELECT ID_Animation FROM series_animations WHERE ID_Serie = ?');
+                                                $series_animation_associee->execute(array($serie['ID_Serie']));
+                                                $series_animation_associee_count = $series_animation_associee->rowCount();
+                                                echo '<td>';
+                                                if ($series_animation_associee_count > 0) {
+                                                    echo '<ul>'; // Ouvrir la liste
+                                                    while ($series_animation_associees = $series_animation_associee->fetch()) {
+                                                        try {
+                                                            $series_animation = $dbh->prepare('SELECT * FROM animations WHERE ID_Animation = ?');
+                                                            $series_animation->execute(array($series_animation_associees['ID_Animation']));
+                                                            $series_animations = $series_animation->fetch();
+                                                            echo '<li>' . $series_animations['Nom'] . '</li>';
+                                                        } catch (PDOException $e) {
+                                                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                            die();
+                                                        }
+                                                    }
+                                                    echo '</ul>'; // Fermer la liste
+                                                } else {
+                                                    echo 'Aucune animation associées';
                                                 }
                                                 echo '</td>';
                                             } catch (PDOException $e) {

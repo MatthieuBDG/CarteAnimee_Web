@@ -15,7 +15,6 @@ if (isset($_GET['id_serie']) && !empty($_GET['id_serie'])) {
     $verif_serie_exist->execute(array($id_serie));
     if ($verif_serie_exist->rowCount() > 0) {
         $series_infos = $verif_serie_exist->fetch();
-
         try {
             $usersQuery = $dbh->prepare('SELECT *,u.ID_User as ID_User_User FROM users u LEFT JOIN autorisations_series a ON u.ID_User = a.ID_User AND a.ID_Serie = ?');
 
@@ -31,6 +30,28 @@ if (isset($_GET['id_serie']) && !empty($_GET['id_serie'])) {
             // Utilisez la fonction array_filter pour obtenir directement les utilisateurs sans autorisation
             $usersdeaffectes = array_filter($usersWithAuthorization, function ($user) {
                 return empty($user['ID_Serie']);
+            });
+
+            // Maintenant, vous pouvez utiliser $usersWithAuthorization, $usersAffected et $usersDeaffected comme nécessaire
+        } catch (PDOException $e) {
+            echo "Erreur!: " . $e->getMessage() . "<br/>";
+            die();
+        }
+        try {
+            $animationsQuery = $dbh->prepare('SELECT *,a.ID_Animation as ID_Animation_Animation FROM animations a LEFT JOIN series_animations sa ON a.ID_Animation = sa.ID_Animation AND sa.ID_Serie =  ?');
+
+            $animationsQuery->execute(array($id_serie));
+
+            $animationAssocied = $animationsQuery->fetchAll();
+
+            // Utilisez la fonction array_filter pour obtenir directement les utilisateurs avec autorisation
+            $animationassocies = array_filter($animationAssocied, function ($animation) {
+                return !empty($animation['ID_Serie']);
+            });
+
+            // Utilisez la fonction array_filter pour obtenir directement les utilisateurs sans autorisation
+            $animationdeassocies = array_filter($animationAssocied, function ($animation) {
+                return empty($animation['ID_Serie']);
             });
 
             // Maintenant, vous pouvez utiliser $usersWithAuthorization, $usersAffected et $usersDeaffected comme nécessaire
@@ -87,6 +108,40 @@ if (isset($_POST['submitdeaffectation'])) {
         try {
             $deleteserieautorisation = $dbh->prepare('DELETE FROM autorisations_series WHERE ID_Serie = ? AND ID_User = ?');
             $deleteserieautorisation->execute(array($id_serie, $usersaffecte));
+            $success = "La série à bien été modifié !";
+            header('Location: ./listeserie?message=' . $success);
+        } catch (PDOException $e) {
+            echo "Erreur!: " . $e->getMessage() . "<br/>";
+            die();
+        }
+    } else {
+        $erreur = "Tous les champs doivent être complétés";
+    }
+}
+if (isset($_POST['submitaffectationanimation'])) {
+    $animationdeaffecte = htmlspecialchars($_POST['animationdeaffecte']);
+
+    if (!empty($animationdeaffecte) && isset($animationdeaffecte)) {
+        try {
+            $insertanimationassociee = $dbh->prepare('INSERT INTO series_animations (ID_Animation, ID_Serie) VALUES (?, ?)');
+            $insertanimationassociee->execute(array($animationdeaffecte, $id_serie));
+            $success = "La série à bien été modifié !";
+            header('Location: ./listeserie?message=' . $success);
+        } catch (PDOException $e) {
+            echo "Erreur!: " . $e->getMessage() . "<br/>";
+            die();
+        }
+    } else {
+        $erreur = "Tous les champs doivent être complétés";
+    }
+}
+if (isset($_POST['submitdeaffectationanimation'])) {
+    $animationaffecte = htmlspecialchars($_POST['animationaffecte']);
+
+    if (!empty($animationaffecte) && isset($animationaffecte)) {
+        try {
+            $deleteanimationassociee = $dbh->prepare('DELETE FROM series_animations WHERE ID_Serie = ? AND ID_Animation = ?');
+            $deleteanimationassociee->execute(array($id_serie, $animationaffecte));
             $success = "La série à bien été modifié !";
             header('Location: ./listeserie?message=' . $success);
         } catch (PDOException $e) {
@@ -161,14 +216,13 @@ if (isset($_POST['submitdeaffectation'])) {
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="card mt-3">
                                 <div class="card-header">
                                     Affecté/Désaffecté un Enfants/Parents
                                 </div>
                                 <div class="card-body">
-
                                     <div class="row">
-
                                         <div class="col-md-6">
                                             <form method="post">
                                                 <div class="card">
@@ -206,14 +260,61 @@ if (isset($_POST['submitdeaffectation'])) {
                                                     </div>
                                             </form>
                                         </div>
-
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mt-3 mb-5">
+                            <div class="card-header">
+                                Affecté/Désaffecté une animation
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <form method="post">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-floating mb-3">
+                                                        <select class="form-control" name="animationdeaffecte" required>
+                                                            <?php foreach ($animationdeassocies as $animationdeassocie) { ?>
+                                                                <option value="<?php echo $animationdeassocie['ID_Animation_Animation']; ?>"><?php echo $animationdeassocie['Nom'] ?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                        <label>Animation à affecté*</label>
+                                                    </div>
+                                                    <div class="mt-4 mb-0 text-center">
+                                                        <input type="submit" name="submitaffectationanimation" class="btn btn-primary " value="Enregistrer">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <form method="post">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-floating mb-3">
+                                                        <select class="form-control" name="animationaffecte" required>
+                                                            <?php foreach ($animationassocies as $animationassocie) { ?>
+                                                                <option value="<?php echo $animationassocie['ID_Animation_Animation']; ?>"><?php echo $animationassocie['Nom'] ?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                        <label>Animation à desaffecté*</label>
+                                                    </div>
+                                                    <div class="mt-4 mb-0 text-center">
+                                                        <input type="submit" name="submitdeaffectationanimation" class="btn btn-primary" value="Enregistrer">
+                                                    </div>
+                                                </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
         </div>
+    </div>
     </div>
     </main>
     <?php

@@ -21,7 +21,6 @@ if (isset($_POST['submit'])) {
                 $insertnewserie->execute(array($nomserie));
                 $success = "La série $nomserie à bien été crée !";
                 header('Location: ./listeserie?message=' . $success);
-        
             } catch (PDOException $e) {
                 echo "Erreur!: " . $e->getMessage() . "<br/>";
                 die();
@@ -76,18 +75,22 @@ if (isset($_POST['submit'])) {
                                     </div>
                                 <?php }
                                 ?>
-                                <form method="post">
-                                    <div class="row mb-3">
-                                        <div class="col-md-12">
-                                            <div class="form-floating mb-3">
-                                                <input class="form-control" name="nomserie" type="text" placeholder="Animaux" required />
-                                                <label>Nom de la série</label>
-                                            </div>
-                                        </div>
-                                        <div class="mt-4 mb-0">
-                                            <input type="submit" name="submit" class="btn btn-primary" value="Ajouter">
-                                        </div>
-                                </form>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <form method="post">
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating">
+                                                        <input class="form-control" name="nomserie" type="text" placeholder="Animaux" required />
+                                                        <label>Nom de la série</label>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-4 mb-0">
+                                                    <input type="submit" name="submit" class="btn btn-primary" value="Ajouter">
+                                                </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
