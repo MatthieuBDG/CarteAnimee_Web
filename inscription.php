@@ -1,7 +1,19 @@
+<script>
+    // Éviter le renvoi des données lorsque la page est rafraîchie
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>
 <?php
 require 'include/connexion_bdd.php';
-$roles = $dbh->prepare('SELECT * FROM roles');
-$roles->execute(array());
+
+try {
+    $roles = $dbh->prepare('SELECT * FROM roles');
+    $roles->execute(array());
+} catch (PDOException $e) {
+    echo "Erreur!: " . $e->getMessage() . "<br/>";
+    die();
+}
 if (isset($_POST['submit'])) {
     $nom = htmlspecialchars($_POST['nom']);
     $prenom = htmlspecialchars($_POST['prenom']);
@@ -14,15 +26,20 @@ if (isset($_POST['submit'])) {
     $espace = strpos($prenom, $vespace);
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         if ($espace === false) {
-            if (!empty($nom) && isset($nom) || !empty($prenom) && isset($prenom) || !empty($email) && isset($email)  || !empty($mdp) && isset($mdp) || !empty($mdpconfirm) && isset($mdpconfirm)|| !empty($role) && isset($role)) {
+            if (!empty($nom) && isset($nom) || !empty($prenom) && isset($prenom) || !empty($email) && isset($email)  || !empty($mdp) && isset($mdp) || !empty($mdpconfirm) && isset($mdpconfirm) || !empty($role) && isset($role)) {
                 if ($mdp == $mdpconfirm) {
                     if (strlen($mdp) >= 8) {
                         $mailexist = $dbh->prepare('SELECT ID_User FROM users WHERE Email = ?');
                         $mailexist->execute(array($email));
                         if ($mailexist->rowCount() == 0) {
                             $passwordhash = password_hash($mdp, PASSWORD_DEFAULT);
-                            $insertnewuser = $dbh->prepare('INSERT INTO users(Prenom,Nom,Email,Mdp,Role) VALUES (?,?,?,?,?)');
-                            $insertnewuser->execute(array($prenom, $nom, $email, $passwordhash, $role));
+                            try {
+                                $insertnewuser = $dbh->prepare('INSERT INTO users(Prenom,Nom,Email,Mdp,Role) VALUES (?,?,?,?,?)');
+                                $insertnewuser->execute(array($prenom, $nom, $email, $passwordhash, $role));
+                            } catch (PDOException $e) {
+                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                die();
+                            }
                         } else {
                             $erreur = "L'adresse mail est déja utilisé";
                         }

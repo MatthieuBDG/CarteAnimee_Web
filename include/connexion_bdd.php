@@ -1,6 +1,6 @@
 <?php
 //Connexion BDD PFE
-
+session_start();
 $whitelist = array(
     '127.0.0.1',
     '::1'
