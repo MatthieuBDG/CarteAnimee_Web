@@ -39,11 +39,11 @@ if (isset($_GET['id_animation']) && !empty($_GET['id_animation'])) {
             die();
         }
     } else {
-        $error = 'Le numéro de la série n\'est pas valide ou n\'existe pas';
+        $error = 'Le numéro de l\'animation n\'est pas valide ou n\'existe pas';
         header('Location: ./listeanimation?messageerror=' . $error);
     }
 } else {
-    $error = 'Le numéro de la série n\'est pas renseigné';
+    $error = 'Le numéro de l\'animation n\'est pas renseigné';
     header('Location: ./listeserie?messageerror=' . $error);
 }
 

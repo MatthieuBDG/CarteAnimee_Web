@@ -15,19 +15,19 @@ if (isset($_GET['disconnect']) && !empty($_GET['disconnect']) && !isset($_SESSIO
 if (isset($_GET['connect']) && !empty($_GET['connect']) && !isset($_SESSION['ID_User'])) {
     $message_info = "Vous devez être connecté !";
 }
-/*
-if (isset($_GET['error']) && !empty($_GET['error'])) {
+
+if (isset($_GET['pasautorise']) && !empty($_GET['pasautorise'])) {
     $message_warning = "Vous devez être connecté en tant qu'administrateur !";
 }
-*/
+
 if (isset($_POST['submit'])) {
 
     $email = htmlspecialchars($_POST['email']);
     $mdp = htmlspecialchars($_POST['mdp']);
     if (!empty($email) && isset($email) || !empty($mdp) && isset($mdp)) {
         try {
-            $req_verif_existe_user = $dbh->prepare("SELECT * FROM users WHERE Email = ? AND Role = ?");
-            $req_verif_existe_user->execute(array($email, 1));
+            $req_verif_existe_user = $dbh->prepare("SELECT * FROM users WHERE Email = ? AND Role != ?");
+            $req_verif_existe_user->execute(array($email, 3));
             $resultat_verif_existe_user = $req_verif_existe_user->rowCount();
         } catch (PDOException $e) {
             echo "Erreur!: " . $e->getMessage() . "<br/>";
@@ -130,9 +130,6 @@ if (isset($_POST['submit'])) {
                                             <input type="submit" name="submit" class="btn btn-primary" value="Connexion">
                                         </div>
                                 </form>
-                            </div>
-                            <div class="card-footer text-center py-3">
-                                <div class="small"><a href="inscription">Besoin d'un compte ? S'inscrire !</a></div>
                             </div>
                         </div>
                     </div>
