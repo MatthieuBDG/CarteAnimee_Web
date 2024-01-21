@@ -2,8 +2,6 @@
 require 'include/connexion_bdd.php';
 
 require 'include/verif_user_connect.php';
-
-
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -49,7 +47,7 @@ require 'include/verif_user_connect.php';
                                         <th>Nom de l'animation</th>
                                         <th>GIF</th>
                                         <th>Audio</th>
-                                        <th>Série associée</th>
+                                        <th>Séries associées</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -62,8 +60,10 @@ require 'include/verif_user_connect.php';
                                         while ($animation = $animations->fetch()) {
                                             echo '<tr>';
                                             echo '<td>' . $animation['Nom'] . '</td>';
-                                            echo '<td>' . $animation['Chemin_Gif'] . '</td>';
-                                            echo '<td>' . $animation['Chemin_Audio'] . '</td>';
+                                            echo '<td><img src="' . $animation['Chemin_Gif'] . '" alt="Gif de l\'animation" class="rounded img-fluid mx-auto d-block" style="max-width: 20%"/> <p class="text-center">' . $animation['Chemin_Gif'] . '</p></td>';
+                                           
+                                            echo '<td><audio controls class="w-100"><source src="' . $animation['Chemin_Audio'] . '" type="audio/mpeg">Your browser does not support the audio tag.</audio> <p class="text-center">' . $animation['Chemin_Audio'] . '</p></td>';
+
                                             try {
                                                 $series_associe = $dbh->prepare('SELECT ID_Serie FROM series_animations WHERE ID_Animation = ?');
                                                 $series_associe->execute(array($animation['ID_Animation']));

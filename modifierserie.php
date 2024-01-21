@@ -71,14 +71,21 @@ if (isset($_POST['submit'])) {
     $nomserie = htmlspecialchars($_POST['nomserie']);
 
     if (!empty($nomserie) && isset($nomserie)) {
-        try {
-            $updateserie = $dbh->prepare('UPDATE series SET Nom = ? WHERE ID_Serie = ?');
-            $updateserie->execute(array($nomserie, $id_serie));
-            $success = "La série $nomserie à bien été modifié !";
-            header('Location: ./listeserie?message=' . $success);
-        } catch (PDOException $e) {
-            echo "Erreur!: " . $e->getMessage() . "<br/>";
-            die();
+        $serieexist = $dbh->prepare('SELECT Nom FROM series WHERE Nom = ? AND ID_Serie != ?');
+        $serieexist->execute(array($nomserie, $id_serie));
+
+        if ($serieexist->rowCount() == 0) {
+            try {
+                $updateserie = $dbh->prepare('UPDATE series SET Nom = ? WHERE ID_Serie = ?');
+                $updateserie->execute(array($nomserie, $id_serie));
+                $success = "La série $nomserie à bien été modifié !";
+                header('Location: ./listeserie?message=' . $success);
+            } catch (PDOException $e) {
+                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                die();
+            }
+        } else {
+            $erreur = 'Le nom de la série est déjà utilisé';
         }
     } else {
         $erreur = "Tous les champs doivent être complétés";
@@ -160,7 +167,7 @@ if (isset($_POST['submitdeaffectationanimation'])) {
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Liste des séries</title>
+    <title>Modification d'une série</title>
     <link href="css/table.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
     <script src="js/all.js" crossorigin="anonymous"></script>
@@ -216,7 +223,7 @@ if (isset($_POST['submitdeaffectationanimation'])) {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="card mt-3">
                                 <div class="card-header">
                                     Affecté/Désaffecté un Enfants/Parents
@@ -312,7 +319,7 @@ if (isset($_POST['submitdeaffectationanimation'])) {
                         </div>
                     </div>
                 </div>
-                
+
         </div>
     </div>
     </div>
