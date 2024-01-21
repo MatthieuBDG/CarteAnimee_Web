@@ -21,7 +21,6 @@ if (isset($_GET['pasautorise']) && !empty($_GET['pasautorise'])) {
 }
 
 if (isset($_POST['submit'])) {
-
     $email = htmlspecialchars($_POST['email']);
     $mdp = htmlspecialchars($_POST['mdp']);
     if (!empty($email) && isset($email) || !empty($mdp) && isset($mdp)) {
