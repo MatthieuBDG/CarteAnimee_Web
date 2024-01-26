@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : dim. 21 jan. 2024 à 17:01
+-- Généré le : ven. 26 jan. 2024 à 21:06
 -- Version du serveur : 10.4.27-MariaDB
 -- Version de PHP : 7.4.33
 
@@ -34,6 +34,13 @@ CREATE TABLE `animations` (
   `Chemin_Audio` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `animations`
+--
+
+INSERT INTO `animations` (`ID_Animation`, `Nom`, `Chemin_Gif`, `Chemin_Audio`) VALUES
+(1, 'GIF', 'assets/img/Td9n.gif', 'assets/music/childish-prank-21177.mp3');
+
 -- --------------------------------------------------------
 
 --
@@ -44,6 +51,14 @@ CREATE TABLE `autorisations_series` (
   `ID_User` int(11) NOT NULL,
   `ID_Serie` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `autorisations_series`
+--
+
+INSERT INTO `autorisations_series` (`ID_User`, `ID_Serie`) VALUES
+(7, 1),
+(7, 2);
 
 -- --------------------------------------------------------
 
@@ -61,7 +76,7 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`ID_Role`, `Nom`) VALUES
-(1, 'Administrateur '),
+(1, 'Administrateur'),
 (2, 'Docteur'),
 (3, 'Enfant/Parent');
 
@@ -76,6 +91,14 @@ CREATE TABLE `series` (
   `Nom` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `series`
+--
+
+INSERT INTO `series` (`ID_Serie`, `Nom`) VALUES
+(1, 'Meteo'),
+(2, 'Animaux');
+
 -- --------------------------------------------------------
 
 --
@@ -86,6 +109,13 @@ CREATE TABLE `series_animations` (
   `ID_Serie` int(11) NOT NULL,
   `ID_Animation` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `series_animations`
+--
+
+INSERT INTO `series_animations` (`ID_Serie`, `ID_Animation`) VALUES
+(1, 1);
 
 -- --------------------------------------------------------
 
@@ -107,7 +137,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`ID_User`, `Prenom`, `Nom`, `Email`, `Mdp`, `Role`) VALUES
-(7, 'Matthieu', 'Boubée de Gramont', 'matdegramont@gmail.com', '$2y$10$gfFZzki3jqIupG6AVvSKT.sBbPO4FVQqwfNqKo1wJe20FVV70P5Ym', 1),
+(7, 'Matthieu', 'Boubée de Gramont', 'matdegramont@gmail.com', '$2y$10$gfFZzki3jqIupG6AVvSKT.sBbPO4FVQqwfNqKo1wJe20FVV70P5Ym', 2),
 (9, 'Lucas', 'Dallas Costa', 'lucas.dallascosta@gmail.com', '$2y$10$tZ.qeOtbylc69oMkbfQYUuiHb2Q7utdPCSwr81S1ls/Rvq3Zazbh2', 2);
 
 --
@@ -124,7 +154,6 @@ ALTER TABLE `animations`
 -- Index pour la table `autorisations_series`
 --
 ALTER TABLE `autorisations_series`
-  ADD PRIMARY KEY (`ID_User`,`ID_Serie`),
   ADD KEY `id_serie` (`ID_Serie`);
 
 --
@@ -143,7 +172,6 @@ ALTER TABLE `series`
 -- Index pour la table `series_animations`
 --
 ALTER TABLE `series_animations`
-  ADD PRIMARY KEY (`ID_Serie`,`ID_Animation`),
   ADD KEY `id_animation` (`ID_Animation`);
 
 --
@@ -160,7 +188,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `animations`
 --
 ALTER TABLE `animations`
-  MODIFY `ID_Animation` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Animation` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `roles`
@@ -172,31 +200,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT pour la table `series`
 --
 ALTER TABLE `series`
-  MODIFY `ID_Serie` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID_Serie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
   MODIFY `ID_User` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- Contraintes pour les tables déchargées
---
-
---
--- Contraintes pour la table `autorisations_series`
---
-ALTER TABLE `autorisations_series`
-  ADD CONSTRAINT `autorisations_series_ibfk_1` FOREIGN KEY (`ID_User`) REFERENCES `users` (`ID_User`),
-  ADD CONSTRAINT `autorisations_series_ibfk_2` FOREIGN KEY (`ID_Serie`) REFERENCES `series` (`ID_Serie`);
-
---
--- Contraintes pour la table `series_animations`
---
-ALTER TABLE `series_animations`
-  ADD CONSTRAINT `series_animations_ibfk_1` FOREIGN KEY (`ID_Serie`) REFERENCES `series` (`ID_Serie`),
-  ADD CONSTRAINT `series_animations_ibfk_2` FOREIGN KEY (`ID_Animation`) REFERENCES `animations` (`ID_Animation`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -57,5 +57,4 @@ if ($resultat_verif_existe_user > 0) {
     $response['error_msg'] = 'Utilisateur non trouvé';
 }
 
-echo json_encode($response, JSON_UNESCAPED_UNICODE);
-?>
+echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
