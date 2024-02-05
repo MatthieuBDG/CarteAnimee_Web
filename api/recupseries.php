@@ -12,7 +12,13 @@ if (isset($_GET['id_user'])) {
 }
 
 try {
-    $req_recup_serie_user = $dbh->prepare("SELECT ae.ID_Serie, Nom FROM autorisations_series ae, series s WHERE ID_User = ? AND s.ID_Serie = ae.ID_Serie");
+    $req_recup_serie_user = $dbh->prepare("
+        SELECT DISTINCT s.ID_Serie, s.Nom 
+        FROM autorisations_series ae 
+        JOIN series s ON s.ID_Serie = ae.ID_Serie 
+        JOIN series_animations sa ON s.ID_Serie = sa.ID_Serie 
+        WHERE ID_User = ?
+    ");
     $req_recup_serie_user->execute([$id_user]);
     $count_req_recup_serie_user = $req_recup_serie_user->rowCount();
 } catch (PDOException $e) {
@@ -34,8 +40,9 @@ if ($count_req_recup_serie_user > 0) {
     $response['series'] = $series;
 } else {
     $response['success'] = false;
-    $response['error_msg'] = 'Aucune série trouvée pour cet utilisateur';
+    $response['error_msg'] = 'Aucune série trouvée pour cet utilisateur. Veuillez réessayer';
 }
-
+// Enregistrement de la réponse dans la base de données
+include 'logresponse.php';
+log_response(json_encode($response));
 echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-?>

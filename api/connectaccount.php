@@ -50,11 +50,13 @@ if ($resultat_verif_existe_user > 0) {
         }
     } else {
         $response['success'] = false;
-        $response['error_msg'] = 'Mot de passe incorrect';
+        $response['error_msg'] = 'Mot de passe incorrect. Veuillez réessayer';
     }
 } else {
     $response['success'] = false;
-    $response['error_msg'] = 'Utilisateur non trouvé';
+    $response['error_msg'] = 'Utilisateur non trouvé. Veuillez réessayer';
 }
-
+// Enregistrement de la réponse dans la base de données
+include 'logresponse.php';
+log_response(json_encode($response));
 echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

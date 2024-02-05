@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 26 jan. 2024 à 21:06
+-- Généré le : dim. 28 jan. 2024 à 22:10
 -- Version du serveur : 10.4.27-MariaDB
 -- Version de PHP : 7.4.33
 
@@ -39,7 +39,32 @@ CREATE TABLE `animations` (
 --
 
 INSERT INTO `animations` (`ID_Animation`, `Nom`, `Chemin_Gif`, `Chemin_Audio`) VALUES
-(1, 'GIF', 'assets/img/Td9n.gif', 'assets/music/childish-prank-21177.mp3');
+(1, 'Pikachu', 'assets/img/Td9n.gif', 'assets/music/sounds_sounds_pikachu.mp3'),
+(2, 'Cat', 'assets/img/nyan-cat-gif-1.gif', 'assets/music/ANMLCat_Miaulement chat 2 (ID 1890)_LS.mp3'),
+(3, 'Pluie', 'assets/img/JTCJ.gif', 'assets/music/RAINWatr_Pluie sur flaques d eau (ID 1290)_LS.mp3');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `api_usage`
+--
+
+CREATE TABLE `api_usage` (
+  `ID_Api` int(11) NOT NULL,
+  `Response_Json` varchar(500) NOT NULL,
+  `Api_Url` varchar(255) NOT NULL,
+  `Date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `api_usage`
+--
+
+INSERT INTO `api_usage` (`ID_Api`, `Response_Json`, `Api_Url`, `Date`) VALUES
+(3, '{\"success\":false,\"error_msg\":\"Mot de passe incorrect. Veuillez r\\u00e9essayer\"}', '/PFE/api/connectaccount.php?email=matdegramont@gma', '2024-01-28 22:05:55'),
+(4, '{\"success\":false,\"error_msg\":\"Mot de passe incorrect. Veuillez r\\u00e9essayer\"}', '/PFE/api/connectaccount.php', '2024-01-28 22:07:39'),
+(5, '{\"success\":true,\"user\":{\"ID_User\":\"7\",\"Prenom\":\"Matthieu\",\"Nom\":\"Boub\\u00e9e de Gramont\",\"Email\":\"matdegramont@gmail.com\",\"ID_Role\":\"3\",\"Role\":\"Enfant\\/Parent\"}}', '/PFE/api/connectaccount.php', '2024-01-28 22:08:20'),
+(6, '{\"success\":true,\"series\":[{\"ID_Serie\":\"1\",\"Nom\":\"Meteo\"},{\"ID_Serie\":\"2\",\"Nom\":\"Animaux\"}]}', '/PFE/api/recupseries.php', '2024-01-28 22:08:51');
 
 -- --------------------------------------------------------
 
@@ -58,7 +83,10 @@ CREATE TABLE `autorisations_series` (
 
 INSERT INTO `autorisations_series` (`ID_User`, `ID_Serie`) VALUES
 (7, 1),
-(7, 2);
+(7, 2),
+(9, 1),
+(9, 3),
+(7, 3);
 
 -- --------------------------------------------------------
 
@@ -115,7 +143,9 @@ CREATE TABLE `series_animations` (
 --
 
 INSERT INTO `series_animations` (`ID_Serie`, `ID_Animation`) VALUES
-(1, 1);
+(2, 1),
+(2, 2),
+(1, 3);
 
 -- --------------------------------------------------------
 
@@ -137,8 +167,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`ID_User`, `Prenom`, `Nom`, `Email`, `Mdp`, `Role`) VALUES
-(7, 'Matthieu', 'Boubée de Gramont', 'matdegramont@gmail.com', '$2y$10$gfFZzki3jqIupG6AVvSKT.sBbPO4FVQqwfNqKo1wJe20FVV70P5Ym', 2),
-(9, 'Lucas', 'Dallas Costa', 'lucas.dallascosta@gmail.com', '$2y$10$tZ.qeOtbylc69oMkbfQYUuiHb2Q7utdPCSwr81S1ls/Rvq3Zazbh2', 2);
+(7, 'Matthieu', 'Boubee de Gramont', 'matdegramont@gmail.com', '$2y$10$gfFZzki3jqIupG6AVvSKT.sBbPO4FVQqwfNqKo1wJe20FVV70P5Ym', 3),
+(9, 'Lucas', 'Dallas Costa', 'lucas.dallascosta@gmail.com', '$2y$10$tZ.qeOtbylc69oMkbfQYUuiHb2Q7utdPCSwr81S1ls/Rvq3Zazbh2', 3),
+(10, 'Matthieu', 'Boubee de Gramont', 'mattdegramont@gmail.com', '$2y$10$gfFZzki3jqIupG6AVvSKT.sBbPO4FVQqwfNqKo1wJe20FVV70P5Ym', 2);
 
 --
 -- Index pour les tables déchargées
@@ -149,6 +180,12 @@ INSERT INTO `users` (`ID_User`, `Prenom`, `Nom`, `Email`, `Mdp`, `Role`) VALUES
 --
 ALTER TABLE `animations`
   ADD PRIMARY KEY (`ID_Animation`);
+
+--
+-- Index pour la table `api_usage`
+--
+ALTER TABLE `api_usage`
+  ADD PRIMARY KEY (`ID_Api`);
 
 --
 -- Index pour la table `autorisations_series`
@@ -188,7 +225,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `animations`
 --
 ALTER TABLE `animations`
-  MODIFY `ID_Animation` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID_Animation` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT pour la table `api_usage`
+--
+ALTER TABLE `api_usage`
+  MODIFY `ID_Api` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT pour la table `roles`
@@ -200,13 +243,13 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT pour la table `series`
 --
 ALTER TABLE `series`
-  MODIFY `ID_Serie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID_Serie` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
-  MODIFY `ID_User` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ID_User` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
