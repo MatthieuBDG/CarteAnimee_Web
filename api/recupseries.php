@@ -37,6 +37,7 @@ if ($count_req_recup_serie_user > 0) {
         ];
     }
     $response['success'] = true;
+    $response['series_count'] = $count_req_recup_serie_user;
     $response['series'] = $series;
 } else {
     $response['success'] = false;
