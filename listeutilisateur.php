@@ -42,7 +42,7 @@ require 'include/verif_user_admin.php';
                     <?php } ?>
                     <div class="card mb-4">
                         <div class="card-body">
-                            <a href="inscription" class="btn btn-primary mb-3">Ajouter une utilisateur</a>
+                            <a href="inscription" class="btn btn-primary mb-3">Ajouter un utilisateur</a>
                             <table id="datatablesSimple">
                                 <thead>
                                     <tr>

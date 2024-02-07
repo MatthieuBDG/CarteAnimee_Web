@@ -1,4 +1,5 @@
-Un patient a t-il le droit de ce connecter sur l'interface web ou uniquement sur le mobile / tablette ?
-Comment on peux faire pour avoir un serveur Web distante ? 
-A chaque fois que l’écran est touché, l’image s’anime avec un son. A la fin de l’animation, une autre image est présentée ?
-Au niveau de la bdd il faut que l'enfant soit associée a un parent ?
+Comment on peux faire pour avoir un serveur Web distante ? pas un soucis pour lui et mickael bonnet non plus
+Un patient a t-il le droit de ce connecter sur l'interface web ou uniquement sur le mobile / tablette ? non c'est bien    
+A chaque fois que l’écran est touché, l’image s’anime avec un son. A la fin de l’animation, une autre image est présentée ? je sais pas 
+Au niveau de la bdd il faut que l'enfant soit associée a un parent ? non pas besoin
+API rest en php ? Oui pas de probleme

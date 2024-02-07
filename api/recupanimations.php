@@ -4,7 +4,9 @@ include '../include/connexion_bdd.php';
 $response = [];
 
 if (isset($_GET['id_serie'])) {
-    $id_serie = $_GET['id_serie'];
+    $id_serie = $_GET['id_serie'];  
+    // Récupération des épisodes de la série demandée
+    
 } else {
     $response['success'] = false;
     $response['error_msg'] = 'Paramètres id_serie introuvable';
