@@ -29,6 +29,9 @@ if (isset($_POST['submit'])) {
             $maxWidth = 1000;
             $maxHeight = 1000;
 
+            // Limite pour l'audio (durée)
+            $maxAudioDuration = 30; // en secondes
+
             // Vérification des dimensions du GIF
             list($width, $height) = getimagesize($_FILES['gif']['tmp_name']);
 
@@ -36,35 +39,43 @@ if (isset($_POST['submit'])) {
             $extensionAudio = pathinfo($_FILES['audio']['name'], PATHINFO_EXTENSION);
             if ($width > $maxWidth || $height > $maxHeight) {
                 $erreur = "Les dimensions du GIF ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels.";
-            } else 
-            if (in_array($extensionGif, $extensionsGifAutorisees)) {
-                if (in_array($extensionAudio, $extensionsAudioAutorisees)) {
+            }
+            // Vérification de la durée de l'audio avec getID3
+            require 'include/getID3-master/getid3/getid3.php'; 
+            $getID3 = new getID3;
+            $audioInfo = $getID3->analyze($_FILES['audio']['tmp_name']);
 
-                    move_uploaded_file($_FILES['gif']['tmp_name'], $cheminGif);
-                    move_uploaded_file($_FILES['audio']['tmp_name'], $cheminAudio);
+            if ($width > $maxWidth || $height > $maxHeight) {
+                $erreur = "Les dimensions du GIF ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels.";
+            } elseif ($audioInfo['playtime_seconds'] > $maxAudioDuration) {
+                $erreur = "La durée de l'audio ne doit pas dépasser {$maxAudioDuration} secondes.";
+            } else {
+                if (in_array($extensionGif, $extensionsGifAutorisees)) {
+                    if (in_array($extensionAudio, $extensionsAudioAutorisees)) {
 
-                    try {
-                        $insertAnimation = $dbh->prepare('INSERT INTO animations(Nom, Chemin_Gif, Chemin_Audio) VALUES (?, ?, ?)');
-                        $insertAnimation->execute(array($nomAnimation, $cheminGif, $cheminAudio));
-                        $success = "L'animation $nomAnimation a bien été ajoutée !";
-                        header('Location: ./listeanimation?message=' . $success);
-                    } catch (PDOException $e) {
-                        echo "Erreur!: " . $e->getMessage() . "<br/>";
-                        die();
+                        move_uploaded_file($_FILES['gif']['tmp_name'], $cheminGif);
+                        move_uploaded_file($_FILES['audio']['tmp_name'], $cheminAudio);
+
+                        try {
+                            $insertAnimation = $dbh->prepare('INSERT INTO animations(Nom, Chemin_Gif, Chemin_Audio) VALUES (?, ?, ?)');
+                            $insertAnimation->execute(array($nomAnimation, $cheminGif, $cheminAudio));
+                            $success = "L'animation $nomAnimation a bien été ajoutée !";
+                            header('Location: ./listeanimation?message=' . $success);
+                        } catch (PDOException $e) {
+                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                            die();
+                        }
+                    } else {
+                        $erreur = 'Les extensions de fichier autorisées pour l\'audio sont uniquement du .mp3 ou .wav';
                     }
                 } else {
-                    $erreur = 'Les extensions de fichier autorisées pour l\'audio sont uniquement du .mp3 ou .wav';
+                    $erreur = 'Les extensions de fichier autorisées pour l\'image sont uniquement du .gif';
                 }
-            } else {
-                $erreur = 'Les extensions de fichier autorisées pour l\'image sont uniquement du .gif';
             }
-        } else {
-            $erreur = 'Le nom de l\'animation est déjà utilisé';
         }
-    } else {
-        $erreur = "Tous les champs doivent être complétés";
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
