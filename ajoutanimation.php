@@ -16,7 +16,7 @@ if (isset($_POST['submit'])) {
     $nomAnimation = htmlspecialchars($_POST['nomanimation']);
     $cheminAudio = 'assets/music/' . basename($_FILES['audio']['name']);
     $cheminGif = 'assets/img/' . basename($_FILES['gif']['name']);
-    
+
     if (!empty($nomAnimation) && isset($nomAnimation) && !empty($cheminAudio) && isset($cheminAudio) && !empty($cheminGif) && isset($cheminGif)) {
         $animationexist = $dbh->prepare('SELECT Nom FROM animations WHERE Nom = ?');
         $animationexist->execute(array($nomAnimation));
@@ -25,8 +25,18 @@ if (isset($_POST['submit'])) {
             // Gestion de l'upload du fichier GIF
             $extensionGif = pathinfo($_FILES['gif']['name'], PATHINFO_EXTENSION);
 
+            // Limite des dimensions du GIF
+            $maxWidth = 1000;
+            $maxHeight = 1000;
+
+            // Vérification des dimensions du GIF
+            list($width, $height) = getimagesize($_FILES['gif']['tmp_name']);
+
             // Gestion de l'upload du fichier audio
             $extensionAudio = pathinfo($_FILES['audio']['name'], PATHINFO_EXTENSION);
+            if ($width > $maxWidth || $height > $maxHeight) {
+                $erreur = "Les dimensions du GIF ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels.";
+            } else 
             if (in_array($extensionGif, $extensionsGifAutorisees)) {
                 if (in_array($extensionAudio, $extensionsAudioAutorisees)) {
 
@@ -103,7 +113,9 @@ if (isset($_POST['submit'])) {
                                             <div class="row mb-3">
                                                 <div class="col-md-12">
                                                     <div class="form-floating">
-                                                        <input class="form-control" name="nomanimation" type="text" placeholder="Nom de l'animation" value="<?php if(isset($nomAnimation)){ echo $nomAnimation; }?>" />
+                                                        <input class="form-control" name="nomanimation" type="text" placeholder="Nom de l'animation" value="<?php if (isset($nomAnimation)) {
+                                                                                                                                                                echo $nomAnimation;
+                                                                                                                                                            } ?>" />
                                                         <label>Nom de l'animation</label>
                                                     </div>
                                                 </div>
