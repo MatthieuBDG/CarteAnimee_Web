@@ -28,13 +28,35 @@ try {
 }
 
 if ($count_req_recup_serie_user > 0) {
+
     $resultat_req_recup_serie_user = $req_recup_serie_user->fetchAll(PDO::FETCH_ASSOC);
     $series = [];
     foreach ($resultat_req_recup_serie_user as $row) {
-        $series[] = [
+        $serieItem = [
             'ID_Serie' => $row['ID_Serie'],
-            'Nom' => $row['Nom']
+            'Nom' => $row['Nom'],
+            'Pourcentage' => 0, // Initialiser le pourcentage à null par défaut
+            'Derniere_Animation' => 0
         ];
+    
+        try {
+            $req_recup_serie_pourcentage = $dbh->prepare("SELECT Pourcentage,Derniere_Animation FROM avancement_series WHERE ID_Serie = ?");
+            $req_recup_serie_pourcentage->execute([$row['ID_Serie']]);
+            $resultat_req_recup_serie_pourcentage = $req_recup_serie_pourcentage->fetchAll(PDO::FETCH_ASSOC);
+    
+            // S'il y a un résultat pour le pourcentage, l'assigner
+            if (!empty($resultat_req_recup_serie_pourcentage)) {
+                $serieItem['Pourcentage'] = $resultat_req_recup_serie_pourcentage[0]['Pourcentage'];
+                $serieItem['Derniere_Animation'] = $resultat_req_recup_serie_pourcentage[0]['Derniere_Animation'];
+            }
+        } catch (PDOException $e) {
+            $response['success'] = false;
+            $response['error_msg'] = 'Erreur de la base de données : ' . $e->getMessage();
+            exit(json_encode($response, JSON_UNESCAPED_UNICODE));
+        }
+    
+        // Ajouter l'élément de série à la liste
+        $series[] = $serieItem;
     }
     $response['success'] = true;
     $response['series_count'] = $count_req_recup_serie_user;

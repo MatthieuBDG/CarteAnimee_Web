@@ -5,8 +5,6 @@ $response = [];
 
 if (isset($_GET['id_serie'])) {
     $id_serie = $_GET['id_serie'];  
-    // Récupération des épisodes de la série demandée
-    
 } else {
     $response['success'] = false;
     $response['error_msg'] = 'Paramètres id_serie introuvable';
@@ -14,7 +12,7 @@ if (isset($_GET['id_serie'])) {
 }
 
 try {
-    $req_recup_animation_serie = $dbh->prepare("SELECT a.ID_Animation,a.Nom,Chemin_Gif,Chemin_Audio FROM series_animations sa,series s,animations a WHERE s.ID_Serie = ? AND s.ID_Serie = sa.ID_Serie AND a.ID_Animation = sa.ID_Animation ORDER BY RAND()");
+    $req_recup_animation_serie = $dbh->prepare("SELECT a.ID_Animation,a.Nom,Chemin_Gif,Chemin_Audio FROM series_animations sa,series s,animations a WHERE s.ID_Serie = ? AND s.ID_Serie = sa.ID_Serie AND a.ID_Animation = sa.ID_Animation");
     $req_recup_animation_serie->execute([$id_serie]);
     $count_req_recup_animation_serie = $req_recup_animation_serie->rowCount();
 } catch (PDOException $e) {

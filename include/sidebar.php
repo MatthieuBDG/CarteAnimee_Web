@@ -22,6 +22,7 @@
                     </nav>
                 </div>
                 <?php if (isset($_SESSION['ID_User'])) { ?>
+                    <a class="nav-link" href="avancementutilisateur"><div class="sb-nav-link-icon"><i class="fas fa-solid fa-spinner"></i></div> Avancement utilisateurs</a>
                     <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSerie" aria-expanded="false" aria-controls="collapseSerie">
                         <div class="sb-nav-link-icon"><i class="fas fa-folder-open"></i></div>
                         Séries
