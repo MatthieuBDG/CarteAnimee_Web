@@ -132,8 +132,20 @@ if (isset($_POST['submit'])) {
 
             // Gestion de la modification du fichier audio
             $cheminAudio = $animation_infos['Chemin_Audio'];
+
+            // Limite pour l'audio (durée)
+            $maxAudioDuration = 30; // en secondes
+
             if (!empty($_FILES['audio']['name'])) {
                 $extensionAudio = pathinfo($_FILES['audio']['name'], PATHINFO_EXTENSION);
+
+                require 'include/getID3-master/getid3/getid3.php';
+                $getID3 = new getID3;
+                $audioInfo = $getID3->analyze($_FILES['audio']['tmp_name']);
+
+                if ($audioInfo['playtime_seconds'] > $maxAudioDuration) {
+                    $erreur_duree_audio = true;
+                } else 
                 if (in_array($extensionAudio, $extensionsAudioAutorisees)) {
                     $cheminAudio = 'assets/music/' . basename($_FILES['audio']['name']);
                     move_uploaded_file($_FILES['audio']['tmp_name'], $cheminAudio);
@@ -156,20 +168,25 @@ if (isset($_POST['submit'])) {
                     $erreur_audio = true;
                 }
             }
+
             if (!isset($erreur_gif)) {
                 if (!isset($erreur_taille_gif)) {
-                    if (!isset($erreur_audio)) {
-                        try {
-                            $updateAnimation = $dbh->prepare('UPDATE animations SET Nom=?, Chemin_Gif_Reel=?, Chemin_Gif_Fictif=?, Chemin_Audio=? WHERE ID_Animation=?');
-                            $updateAnimation->execute(array($nomAnimation, $cheminGifReel, $cheminGifFictif, $cheminAudio, $id_animation));
-                            $success = "L'animation $nomAnimation a bien été modifiée !";
-                            header('Location: ./listeanimation?message=' . $success);
-                        } catch (PDOException $e) {
-                            echo "Erreur!: " . $e->getMessage() . "<br/>";
-                            die();
+                    if (!isset($erreur_duree_audio)) {
+                        if (!isset($erreur_audio)) {
+                            try {
+                                $updateAnimation = $dbh->prepare('UPDATE animations SET Nom=?, Chemin_Gif_Reel=?, Chemin_Gif_Fictif=?, Chemin_Audio=? WHERE ID_Animation=?');
+                                $updateAnimation->execute(array($nomAnimation, $cheminGifReel, $cheminGifFictif, $cheminAudio, $id_animation));
+                                $success = "L'animation $nomAnimation a bien été modifiée !";
+                                header('Location: ./listeanimation?message=' . $success);
+                            } catch (PDOException $e) {
+                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                die();
+                            }
+                        } else {
+                            $erreur = 'Les extensions de fichier autorisées pour l\'audio sont uniquement du .mp3 ou .wav';
                         }
                     } else {
-                        $erreur = 'Les extensions de fichier autorisées pour l\'audio sont uniquement du .mp3 ou .wav';
+                        $erreur = "La durée de l'audio ne doit pas dépasser {$maxAudioDuration} secondes";
                     }
                 } else {
                     $erreur = "Les dimensions du GIF ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels";
