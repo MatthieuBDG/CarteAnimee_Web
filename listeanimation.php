@@ -45,7 +45,8 @@ require 'include/verif_user_connect.php';
                                 <thead>
                                     <tr>
                                         <th>Nom de l'animation</th>
-                                        <th>GIF</th>
+                                        <th>GIF Réel</th>
+                                        <th>GIF Fictif</th>
                                         <th>Audio</th>
                                         <th>Séries associées</th>
                                         <th>Actions</th>
@@ -60,7 +61,8 @@ require 'include/verif_user_connect.php';
                                         while ($animation = $animations->fetch()) {
                                             echo '<tr>';
                                             echo '<td>' . $animation['Nom'] . '</td>';
-                                            echo '<td><img src="' . $animation['Chemin_Gif'] . '" alt="Gif de l\'animation" class="rounded img-fluid mx-auto d-block" style="max-width: 20%"/> <p class="text-center">' . $animation['Chemin_Gif'] . '</p></td>';
+                                            echo '<td><img src="' . $animation['Chemin_Gif_Reel'] . '" alt="Gif Reel de l\'animation" class="rounded img-fluid mx-auto d-block" style="max-width: 20%"/> <p class="text-center">' . $animation['Chemin_Gif_Reel'] . '</p></td>';
+                                            echo '<td><img src="' . $animation['Chemin_Gif_Fictif'] . '" alt="Gif Fictif de l\'animation" class="rounded img-fluid mx-auto d-block" style="max-width: 20%"/> <p class="text-center">' . $animation['Chemin_Gif_Fictif'] . '</p></td>';
                                            
                                             echo '<td><audio controls class="w-100"><source src="' . $animation['Chemin_Audio'] . '" type="audio/mpeg">Your browser does not support the audio tag.</audio> <p class="text-center">' . $animation['Chemin_Audio'] . '</p></td>';
 
