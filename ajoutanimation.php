@@ -42,7 +42,7 @@ if (isset($_POST['submit'])) {
             $extensionAudio = pathinfo($_FILES['audio']['name'], PATHINFO_EXTENSION);
 
             // Vérification de la durée de l'audio avec getID3
-            require 'include/getID3-master/getid3/getid3.php'; 
+            require 'include/getID3-master/getid3/getid3.php';
             $getID3 = new getID3;
             $audioInfo = $getID3->analyze($_FILES['audio']['tmp_name']);
 
@@ -54,7 +54,7 @@ if (isset($_POST['submit'])) {
             if ($audioInfo['playtime_seconds'] > $maxAudioDuration) {
                 $erreur = "La durée de l'audio ne doit pas dépasser {$maxAudioDuration} secondes";
             } else {
-                if (in_array($extensionGif, $extensionsGifAutorisees)) {
+                if (in_array($extensionGifReel, $extensionsGifAutorisees) || in_array($extensionGifFictif, $extensionsGifAutorisees)) {
                     if (in_array($extensionAudio, $extensionsAudioAutorisees)) {
 
                         move_uploaded_file($_FILES['gif_reel']['tmp_name'], $cheminGifReel);
