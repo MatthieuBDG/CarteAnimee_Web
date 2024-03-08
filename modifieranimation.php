@@ -59,19 +59,47 @@ if (isset($_POST['submit'])) {
 
         if ($animationexist->rowCount() == 0) {
             // Gestion de la modification du fichier GIF
-            $cheminGif = $animation_infos['Chemin_Gif'];
-            if (!empty($_FILES['gif']['name'])) {
-                $extensionGif = pathinfo($_FILES['gif']['name'], PATHINFO_EXTENSION);
+            $cheminGifReel = $animation_infos['Chemin_Gif_Reel'];
+            $cheminGifFictif = $animation_infos['Chemin_Gif_Fictif'];
+
+            if (!empty($_FILES['gif_reel']['name'])) {
+                $extensionGif = pathinfo($_FILES['gif_reel']['name'], PATHINFO_EXTENSION);
 
                 if (in_array($extensionGif, $extensionsGifAutorisees)) {
-                    $cheminGif = 'assets/img/' . basename($_FILES['gif']['name']);
-                    move_uploaded_file($_FILES['gif']['tmp_name'], $cheminGif);
+                    $cheminGifReel = 'assets/img/' . basename($_FILES['gif_reel']['name']);
+                    move_uploaded_file($_FILES['gif_reel']['tmp_name'], $cheminGifReel);
                     try {
-                        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif = ? AND ID_Animation != ?');
-                        $verif_gif_usage->execute(array($animation_infos['Chemin_Gif'], $id_animation));
+                        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Reel = ? AND ID_Animation != ?');
+                        $verif_gif_usage->execute(array($animation_infos['Chemin_Gif_Reel'], $id_animation));
                         if ($verif_gif_usage->rowCount() == 0) {
                             try {
-                                unlink($animation_infos['Chemin_Gif']);
+                                unlink($animation_infos['Chemin_Gif_Reel']);
+                            } catch (PDOException $e) {
+                                echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                die();
+                            }
+                        }
+                    } catch (PDOException $e) {
+                        echo "Erreur!: " . $e->getMessage() . "<br/>";
+                        die();
+                    }
+                } else {
+                    $erreur_gif = true;
+                }
+            }
+
+            if (!empty($_FILES['gif_fictif']['name'])) {
+                $extensionGif = pathinfo($_FILES['gif_fictif']['name'], PATHINFO_EXTENSION);
+
+                if (in_array($extensionGif, $extensionsGifAutorisees)) {
+                    $cheminGifFictif = 'assets/img/' . basename($_FILES['gif_fictif']['name']);
+                    move_uploaded_file($_FILES['gif_fictif']['tmp_name'], $cheminGifFictif);
+                    try {
+                        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Fictif = ? AND ID_Animation != ?');
+                        $verif_gif_usage->execute(array($animation_infos['Chemin_Gif_Fictif'], $id_animation));
+                        if ($verif_gif_usage->rowCount() == 0) {
+                            try {
+                                unlink($animation_infos['Chemin_Gif_Fictif']);
                             } catch (PDOException $e) {
                                 echo "Erreur!: " . $e->getMessage() . "<br/>";
                                 die();
@@ -115,8 +143,8 @@ if (isset($_POST['submit'])) {
             if (!isset($erreur_gif)) {
                 if (!isset($erreur_audio)) {
                     try {
-                        $updateAnimation = $dbh->prepare('UPDATE animations SET Nom=?, Chemin_Gif=?, Chemin_Audio=? WHERE ID_Animation=?');
-                        $updateAnimation->execute(array($nomAnimation, $cheminGif, $cheminAudio, $id_animation));
+                        $updateAnimation = $dbh->prepare('UPDATE animations SET Nom=?, Chemin_Gif_Reel=?, Chemin_Gif_Fictif=?, Chemin_Audio=? WHERE ID_Animation=?');
+                        $updateAnimation->execute(array($nomAnimation, $cheminGifReel, $cheminGifFictif, $cheminAudio, $id_animation));
                         $success = "L'animation $nomAnimation a bien été modifiée !";
                         header('Location: ./listeanimation?message=' . $success);
                     } catch (PDOException $e) {
@@ -230,10 +258,10 @@ if (isset($_POST['submitdeaffectationserie'])) {
                                                 <div class="col-md-6">
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <img src="<?php echo $animation_infos['Chemin_Gif']; ?>" alt="Gif de l'animation" class="rounded img-fluid" />
+                                                            <img src="<?php echo $animation_infos['Chemin_Gif_Reel']; ?>" alt="Gif réel de l'animation" class="rounded img-fluid" />
                                                             <div class="form-floating mt-3">
-                                                                <input type="file" class="form-control" name="gif" accept=".gif" />
-                                                                <label>Nouvelle Image GIF</label>
+                                                                <input type="file" class="form-control" name="gif_reel" accept=".gif" />
+                                                                <label>Nouvelle Image Réel GIF</label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -241,17 +269,30 @@ if (isset($_POST['submitdeaffectationserie'])) {
                                                 <div class="col-md-6">
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <audio controls class="w-100">
-                                                                <source src="<?php echo $animation_infos['Chemin_Audio']; ?>" type="audio/mpeg">
-                                                                Your browser does not support the audio tag.
-                                                            </audio>
+                                                            <img src="<?php echo $animation_infos['Chemin_Gif_Fictif']; ?>" alt="Gif fictif de l'animation" class="rounded img-fluid" />
                                                             <div class="form-floating mt-3">
-                                                                <input type="file" class="form-control" name="audio" accept="audio/*" />
-                                                                <label>Nouveau Fichier Audio</label>
+                                                                <input type="file" class="form-control" name="gif_fictif" accept=".gif" />
+                                                                <label>Nouvelle Image Fictif GIF</label>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <center>
+                                                    <div class="col-md-6">
+                                                        <div class="card">
+                                                            <div class="card-body">
+                                                                <audio controls class="w-100">
+                                                                    <source src="<?php echo $animation_infos['Chemin_Audio']; ?>" type="audio/mpeg">
+                                                                    Your browser does not support the audio tag.
+                                                                </audio>
+                                                                <div class="form-floating mt-3">
+                                                                    <input type="file" class="form-control" name="audio" accept="audio/*" />
+                                                                    <label>Nouveau Fichier Audio</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </center>
                                             </div>
                                             <div class="mt-4 mb-0">
                                                 <input type="submit" name="submit" class="btn btn-primary" value="Enregistrer">
