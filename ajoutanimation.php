@@ -15,15 +15,17 @@ $extensionsAudioAutorisees = array('mp3', 'wav');
 if (isset($_POST['submit'])) {
     $nomAnimation = htmlspecialchars($_POST['nomanimation']);
     $cheminAudio = 'assets/music/' . basename($_FILES['audio']['name']);
-    $cheminGif = 'assets/img/' . basename($_FILES['gif']['name']);
+    $cheminGifReel = 'assets/img/' . basename($_FILES['gif_reel']['name']);
+    $cheminGifFictif = 'assets/img/' . basename($_FILES['gif_fictif']['name']);
 
-    if (!empty($nomAnimation) && isset($nomAnimation) && !empty($cheminAudio) && isset($cheminAudio) && !empty($cheminGif) && isset($cheminGif)) {
+    if (!empty($nomAnimation) && isset($nomAnimation) && !empty($cheminAudio) && isset($cheminAudio) && !empty($cheminGifReel) && isset($cheminGifReel) && !empty($cheminGifFictif) && isset($cheminGifFictif)) {
         $animationexist = $dbh->prepare('SELECT Nom FROM animations WHERE Nom = ?');
         $animationexist->execute(array($nomAnimation));
 
         if ($animationexist->rowCount() == 0) {
             // Gestion de l'upload du fichier GIF
-            $extensionGif = pathinfo($_FILES['gif']['name'], PATHINFO_EXTENSION);
+            $extensionGifReel = pathinfo($_FILES['gif_reel']['name'], PATHINFO_EXTENSION);
+            $extensionGifFictif = pathinfo($_FILES['gif_fictif']['name'], PATHINFO_EXTENSION);
 
             // Limite des dimensions du GIF
             $maxWidth = 1000;
@@ -33,7 +35,8 @@ if (isset($_POST['submit'])) {
             $maxAudioDuration = 30; // en secondes
 
             // Vérification des dimensions du GIF
-            list($width, $height) = getimagesize($_FILES['gif']['tmp_name']);
+            list($width_reel, $height_reel) = getimagesize($_FILES['gif_reel']['tmp_name']);
+            list($width_fictif, $height_fictif) = getimagesize($_FILES['gif_fictif']['tmp_name']);
 
             // Gestion de l'upload du fichier audio
             $extensionAudio = pathinfo($_FILES['audio']['name'], PATHINFO_EXTENSION);
@@ -43,20 +46,24 @@ if (isset($_POST['submit'])) {
             $getID3 = new getID3;
             $audioInfo = $getID3->analyze($_FILES['audio']['tmp_name']);
 
-            if ($width > $maxWidth || $height > $maxHeight) {
-                $erreur = "Les dimensions du GIF ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels";
-            } elseif ($audioInfo['playtime_seconds'] > $maxAudioDuration) {
+            if ($width_fictif > $maxWidth || $height_fictif > $maxHeight) {
+                $erreur = "Les dimensions du GIF Fictif ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels";
+            } else if ($width_reel > $maxWidth || $height_reel > $maxHeight) {
+                $erreur = "Les dimensions du GIF Réel ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels";
+            } else
+            if ($audioInfo['playtime_seconds'] > $maxAudioDuration) {
                 $erreur = "La durée de l'audio ne doit pas dépasser {$maxAudioDuration} secondes";
             } else {
                 if (in_array($extensionGif, $extensionsGifAutorisees)) {
                     if (in_array($extensionAudio, $extensionsAudioAutorisees)) {
 
-                        move_uploaded_file($_FILES['gif']['tmp_name'], $cheminGif);
+                        move_uploaded_file($_FILES['gif_reel']['tmp_name'], $cheminGifReel);
+                        move_uploaded_file($_FILES['gif_fictif']['tmp_name'], $cheminGifFictif);
                         move_uploaded_file($_FILES['audio']['tmp_name'], $cheminAudio);
 
                         try {
-                            $insertAnimation = $dbh->prepare('INSERT INTO animations(Nom, Chemin_Gif, Chemin_Audio) VALUES (?, ?, ?)');
-                            $insertAnimation->execute(array($nomAnimation, $cheminGif, $cheminAudio));
+                            $insertAnimation = $dbh->prepare('INSERT INTO animations(Nom, Chemin_Gif_Reel, Chemin_Gif_Fictif, Chemin_Audio) VALUES (?, ?, ?, ?)');
+                            $insertAnimation->execute(array($nomAnimation, $cheminGifReel, $cheminGifFictif, $cheminAudio));
                             $success = "L'animation $nomAnimation a bien été ajoutée !";
                             header('Location: ./listeanimation?message=' . $success);
                         } catch (PDOException $e) {
@@ -132,8 +139,16 @@ if (isset($_POST['submit'])) {
                                             <div class="row mb-3">
                                                 <div class="col-md-12">
                                                     <div class="form-floating">
-                                                        <input type="file" class="form-control" name="gif" accept=".gif" required />
-                                                        <label>Image GIF</label>
+                                                        <input type="file" class="form-control" name="gif_reel" accept=".gif" required />
+                                                        <label>Image GIF Réel</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating">
+                                                        <input type="file" class="form-control" name="gif_fictif" accept=".gif" required />
+                                                        <label>Image GIF Fictif</label>
                                                     </div>
                                                 </div>
                                             </div>
