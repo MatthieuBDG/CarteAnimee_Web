@@ -269,6 +269,20 @@ if (isset($_POST['submitdeaffectationserie'])) {
                                                 <div class="col-md-6">
                                                     <div class="card">
                                                         <div class="card-body">
+                                                            <audio controls class="w-100">
+                                                                <source src="<?php echo $animation_infos['Chemin_Audio']; ?>" type="audio/mpeg">
+                                                                Your browser does not support the audio tag.
+                                                            </audio>
+                                                            <div class="form-floating mt-3">
+                                                                <input type="file" class="form-control" name="audio" accept="audio/*" />
+                                                                <label>Nouveau Fichier Audio</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card">
+                                                        <div class="card-body">
                                                             <img src="<?php echo $animation_infos['Chemin_Gif_Fictif']; ?>" alt="Gif fictif de l'animation" class="rounded img-fluid" />
                                                             <div class="form-floating mt-3">
                                                                 <input type="file" class="form-control" name="gif_fictif" accept=".gif" />
@@ -277,22 +291,6 @@ if (isset($_POST['submitdeaffectationserie'])) {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <center>
-                                                    <div class="col-md-6">
-                                                        <div class="card">
-                                                            <div class="card-body">
-                                                                <audio controls class="w-100">
-                                                                    <source src="<?php echo $animation_infos['Chemin_Audio']; ?>" type="audio/mpeg">
-                                                                    Your browser does not support the audio tag.
-                                                                </audio>
-                                                                <div class="form-floating mt-3">
-                                                                    <input type="file" class="form-control" name="audio" accept="audio/*" />
-                                                                    <label>Nouveau Fichier Audio</label>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </center>
                                             </div>
                                             <div class="mt-4 mb-0">
                                                 <input type="submit" name="submit" class="btn btn-primary" value="Enregistrer">
