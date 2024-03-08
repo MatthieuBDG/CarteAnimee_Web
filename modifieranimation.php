@@ -62,26 +62,36 @@ if (isset($_POST['submit'])) {
             $cheminGifReel = $animation_infos['Chemin_Gif_Reel'];
             $cheminGifFictif = $animation_infos['Chemin_Gif_Fictif'];
 
+            // Limite des dimensions du GIF
+            $maxWidth = 1000;
+            $maxHeight = 1000;
+
             if (!empty($_FILES['gif_reel']['name'])) {
                 $extensionGif = pathinfo($_FILES['gif_reel']['name'], PATHINFO_EXTENSION);
 
                 if (in_array($extensionGif, $extensionsGifAutorisees)) {
                     $cheminGifReel = 'assets/img/' . basename($_FILES['gif_reel']['name']);
-                    move_uploaded_file($_FILES['gif_reel']['tmp_name'], $cheminGifReel);
-                    try {
-                        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Reel = ? AND ID_Animation != ?');
-                        $verif_gif_usage->execute(array($animation_infos['Chemin_Gif_Reel'], $id_animation));
-                        if ($verif_gif_usage->rowCount() == 0) {
-                            try {
-                                unlink($animation_infos['Chemin_Gif_Reel']);
-                            } catch (PDOException $e) {
-                                echo "Erreur!: " . $e->getMessage() . "<br/>";
-                                die();
+
+                    list($width, $height) = getimagesize($_FILES['gif_reel']['tmp_name']);
+                    if ($width <= $maxWidth && $height <= $maxHeight) {
+                        move_uploaded_file($_FILES['gif_reel']['tmp_name'], $cheminGifReel);
+                        try {
+                            $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Reel = ? AND ID_Animation != ?');
+                            $verif_gif_usage->execute(array($animation_infos['Chemin_Gif_Reel'], $id_animation));
+                            if ($verif_gif_usage->rowCount() == 0) {
+                                try {
+                                    unlink($animation_infos['Chemin_Gif_Reel']);
+                                } catch (PDOException $e) {
+                                    echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                    die();
+                                }
                             }
+                        } catch (PDOException $e) {
+                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                            die();
                         }
-                    } catch (PDOException $e) {
-                        echo "Erreur!: " . $e->getMessage() . "<br/>";
-                        die();
+                    } else {
+                        $erreur_taille_gif = true;
                     }
                 } else {
                     $erreur_gif = true;
@@ -93,21 +103,27 @@ if (isset($_POST['submit'])) {
 
                 if (in_array($extensionGif, $extensionsGifAutorisees)) {
                     $cheminGifFictif = 'assets/img/' . basename($_FILES['gif_fictif']['name']);
-                    move_uploaded_file($_FILES['gif_fictif']['tmp_name'], $cheminGifFictif);
-                    try {
-                        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Fictif = ? AND ID_Animation != ?');
-                        $verif_gif_usage->execute(array($animation_infos['Chemin_Gif_Fictif'], $id_animation));
-                        if ($verif_gif_usage->rowCount() == 0) {
-                            try {
-                                unlink($animation_infos['Chemin_Gif_Fictif']);
-                            } catch (PDOException $e) {
-                                echo "Erreur!: " . $e->getMessage() . "<br/>";
-                                die();
+
+                    list($width, $height) = getimagesize($_FILES['gif_fictif']['tmp_name']);
+                    if ($width <= $maxWidth && $height <= $maxHeight) {
+                        move_uploaded_file($_FILES['gif_fictif']['tmp_name'], $cheminGifFictif);
+                        try {
+                            $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Fictif = ? AND ID_Animation != ?');
+                            $verif_gif_usage->execute(array($animation_infos['Chemin_Gif_Fictif'], $id_animation));
+                            if ($verif_gif_usage->rowCount() == 0) {
+                                try {
+                                    unlink($animation_infos['Chemin_Gif_Fictif']);
+                                } catch (PDOException $e) {
+                                    echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                    die();
+                                }
                             }
+                        } catch (PDOException $e) {
+                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                            die();
                         }
-                    } catch (PDOException $e) {
-                        echo "Erreur!: " . $e->getMessage() . "<br/>";
-                        die();
+                    } else {
+                        $erreur_taille_gif = true;
                     }
                 } else {
                     $erreur_gif = true;
@@ -141,18 +157,22 @@ if (isset($_POST['submit'])) {
                 }
             }
             if (!isset($erreur_gif)) {
-                if (!isset($erreur_audio)) {
-                    try {
-                        $updateAnimation = $dbh->prepare('UPDATE animations SET Nom=?, Chemin_Gif_Reel=?, Chemin_Gif_Fictif=?, Chemin_Audio=? WHERE ID_Animation=?');
-                        $updateAnimation->execute(array($nomAnimation, $cheminGifReel, $cheminGifFictif, $cheminAudio, $id_animation));
-                        $success = "L'animation $nomAnimation a bien été modifiée !";
-                        header('Location: ./listeanimation?message=' . $success);
-                    } catch (PDOException $e) {
-                        echo "Erreur!: " . $e->getMessage() . "<br/>";
-                        die();
+                if (!isset($erreur_taille_gif)) {
+                    if (!isset($erreur_audio)) {
+                        try {
+                            $updateAnimation = $dbh->prepare('UPDATE animations SET Nom=?, Chemin_Gif_Reel=?, Chemin_Gif_Fictif=?, Chemin_Audio=? WHERE ID_Animation=?');
+                            $updateAnimation->execute(array($nomAnimation, $cheminGifReel, $cheminGifFictif, $cheminAudio, $id_animation));
+                            $success = "L'animation $nomAnimation a bien été modifiée !";
+                            header('Location: ./listeanimation?message=' . $success);
+                        } catch (PDOException $e) {
+                            echo "Erreur!: " . $e->getMessage() . "<br/>";
+                            die();
+                        }
+                    } else {
+                        $erreur = 'Les extensions de fichier autorisées pour l\'audio sont uniquement du .mp3 ou .wav';
                     }
                 } else {
-                    $erreur = 'Les extensions de fichier autorisées pour l\'audio sont uniquement du .mp3 ou .wav';
+                    $erreur = "Les dimensions du GIF ne doivent pas dépasser {$maxWidth}x{$maxHeight} pixels";
                 }
             } else {
                 $erreur = 'Les extensions de fichier autorisées pour l\'image sont uniquement du .gif';
