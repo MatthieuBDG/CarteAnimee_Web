@@ -77,7 +77,11 @@ if (isset($_POST['submit'])) {
                     $erreur = 'Les extensions de fichier autorisées pour l\'image sont uniquement du .gif';
                 }
             }
+        } else {
+            $erreur = 'Le nom de l\'animation est déjà utilisé';
         }
+    } else {
+        $erreur = "Tous les champs doivent être complétés";
     }
 }
 

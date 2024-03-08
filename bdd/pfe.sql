@@ -31,8 +31,8 @@ CREATE TABLE `animations` (
   `ID_Animation` int(11) NOT NULL,
   `Nom` varchar(100) NOT NULL,
   `Chemin_Gif_Reel` varchar(255) NOT NULL,
-  `Chemin_Audio` varchar(255) NOT NULL,
-  `Chemin_Gif_Fictif` varchar(255) NOT NULL
+  `Chemin_Gif_Fictif` varchar(255) NOT NULL,
+  `Chemin_Audio` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
