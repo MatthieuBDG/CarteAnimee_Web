@@ -4,7 +4,7 @@ include '../include/connexion_bdd.php';
 $response = [];
 
 if (isset($_GET['id_serie'])) {
-    $id_serie = $_GET['id_serie'];  
+    $id_serie = $_GET['id_serie'];
 } else {
     $response['success'] = false;
     $response['error_msg'] = 'Paramètres id_serie introuvable';
@@ -12,7 +12,7 @@ if (isset($_GET['id_serie'])) {
 }
 
 try {
-    $req_recup_animation_serie = $dbh->prepare("SELECT a.ID_Animation,a.Nom,Chemin_Gif,Chemin_Audio FROM series_animations sa,series s,animations a WHERE s.ID_Serie = ? AND s.ID_Serie = sa.ID_Serie AND a.ID_Animation = sa.ID_Animation");
+    $req_recup_animation_serie = $dbh->prepare("SELECT a.ID_Animation,a.Nom,Chemin_Gif_Reel,Chemin_Gif_Fictif,Chemin_Audio FROM series_animations sa,series s,animations a WHERE s.ID_Serie = ? AND s.ID_Serie = sa.ID_Serie AND a.ID_Animation = sa.ID_Animation");
     $req_recup_animation_serie->execute([$id_serie]);
     $count_req_recup_animation_serie = $req_recup_animation_serie->rowCount();
 } catch (PDOException $e) {
@@ -28,7 +28,8 @@ if ($count_req_recup_animation_serie > 0) {
         $animations[] = [
             'ID_Animation' => $row['ID_Animation'],
             'Nom' => $row['Nom'],
-            'Chemin_Gif' => $row['Chemin_Gif'],
+            'Chemin_Gif_Reel' => $row['Chemin_Gif_Reel'],
+            'Chemin_Gif_Fictif' => $row['Chemin_Gif_Fictif'],
             'Chemin_Audio' => $row['Chemin_Audio']
         ];
     }
