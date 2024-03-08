@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : localhost:3306
--- Généré le : ven. 08 mars 2024 à 13:22
--- Version du serveur : 10.6.17-MariaDB
--- Version de PHP : 8.1.27
+-- Hôte : 127.0.0.1
+-- Généré le : ven. 08 mars 2024 à 13:43
+-- Version du serveur : 10.4.32-MariaDB
+-- Version de PHP : 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données : `mahq1168_PFE`
+-- Base de données : `pfe`
 --
 
 -- --------------------------------------------------------
@@ -30,25 +30,26 @@ SET time_zone = "+00:00";
 CREATE TABLE `animations` (
   `ID_Animation` int(11) NOT NULL,
   `Nom` varchar(100) NOT NULL,
-  `Chemin_Gif` varchar(255) NOT NULL,
-  `Chemin_Audio` varchar(255) NOT NULL
+  `Chemin_Gif_Reel` varchar(255) NOT NULL,
+  `Chemin_Audio` varchar(255) NOT NULL,
+  `Chemin_Gif_Fictif` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `animations`
 --
 
-INSERT INTO `animations` (`ID_Animation`, `Nom`, `Chemin_Gif`, `Chemin_Audio`) VALUES
-(1, 'Pikachu', 'assets/img/Td9n.gif', 'assets/music/sounds_sounds_pikachu.mp3'),
-(2, 'Chat qui miaule', 'assets/img/1tJ0.gif', 'assets/music/ANMLCat_Miaulement chat 2 (ID 1890)_LS.mp3'),
-(3, 'Chien qui aboie', 'assets/img/giphy.gif', 'assets/music/ANMLDog_Aboiements et pleurs de chiens 1 (ID 1544)_LS.mp3'),
-(4, 'Tempete de vent', 'assets/img/5zo.gif', 'assets/music/WIND_Vent fort 4 (ID 0154)_LS.mp3'),
-(5, 'Pluie qui tombe', 'assets/img/JTCJ.gif', 'assets/music/RAINWatr_Pluie sur flaques d eau (ID 1290)_LS.mp3'),
-(6, 'Voiture qui avance', 'assets/img/car-driving-7.gif', 'assets/music/GENERIQUE OUI OUI FRANCAIS.mp3'),
-(7, 'Camion qui avance', 'assets/img/6iC.gif', 'assets/music/VEHTruck_Moteur de camion 1 (ID 1442)_LS.mp3'),
-(8, 'test', 'assets/img/6iC.gif', 'assets/music/GENERIQUE OUI OUI FRANCAIS.mp3'),
-(9, 'fgtg', 'assets/img/car-cartoons.gif', 'assets/music/VEHTruck_Moteur de camion 1 (ID 1442)_LS.mp3'),
-(10, 'grgtr', 'assets/img/car-cartoons.gif', 'assets/music/GENERIQUE OUI OUI FRANCAIS.mp3');
+INSERT INTO `animations` (`ID_Animation`, `Nom`, `Chemin_Gif_Reel`, `Chemin_Audio`, `Chemin_Gif_Fictif`) VALUES
+(1, 'Pikachu', 'assets/img/Td9n.gif', 'assets/music/sounds_sounds_pikachu.mp3', ''),
+(2, 'Chat qui miaule', 'assets/img/1tJ0.gif', 'assets/music/ANMLCat_Miaulement chat 2 (ID 1890)_LS.mp3', ''),
+(3, 'Chien qui aboie', 'assets/img/giphy.gif', 'assets/music/ANMLDog_Aboiements et pleurs de chiens 1 (ID 1544)_LS.mp3', ''),
+(4, 'Tempete de vent', 'assets/img/5zo.gif', 'assets/music/WIND_Vent fort 4 (ID 0154)_LS.mp3', ''),
+(5, 'Pluie qui tombe', 'assets/img/JTCJ.gif', 'assets/music/RAINWatr_Pluie sur flaques d eau (ID 1290)_LS.mp3', ''),
+(6, 'Voiture qui avance', 'assets/img/car-driving-7.gif', 'assets/music/GENERIQUE OUI OUI FRANCAIS.mp3', ''),
+(7, 'Camion qui avance', 'assets/img/6iC.gif', 'assets/music/VEHTruck_Moteur de camion 1 (ID 1442)_LS.mp3', ''),
+(8, 'test', 'assets/img/6iC.gif', 'assets/music/GENERIQUE OUI OUI FRANCAIS.mp3', ''),
+(9, 'fgtg', 'assets/img/car-cartoons.gif', 'assets/music/VEHTruck_Moteur de camion 1 (ID 1442)_LS.mp3', ''),
+(10, 'grgtr', 'assets/img/car-cartoons.gif', 'assets/music/GENERIQUE OUI OUI FRANCAIS.mp3', '');
 
 -- --------------------------------------------------------
 
