@@ -16,9 +16,9 @@ if (isset($_GET['id_serie']) && !empty($_GET['id_serie'])) {
     if ($verif_serie_exist->rowCount() > 0) {
         $series_infos = $verif_serie_exist->fetch();
         try {
-            $usersQuery = $dbh->prepare('SELECT *,u.ID_User as ID_User_User FROM users u LEFT JOIN autorisations_series a ON u.ID_User = a.ID_User AND a.ID_Serie = ?');
+            $usersQuery = $dbh->prepare('SELECT *,u.ID_User as ID_User_User FROM users u LEFT JOIN autorisations_series a ON u.ID_User = a.ID_User AND a.ID_Serie = ? WHERE u.Role = ?');
 
-            $usersQuery->execute(array($id_serie));
+            $usersQuery->execute(array($id_serie, 3));
 
             $usersWithAuthorization = $usersQuery->fetchAll();
 
