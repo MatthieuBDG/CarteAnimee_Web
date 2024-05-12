@@ -52,8 +52,8 @@ require 'include/verif_user_connect.php';
                                 <tbody>
                                     <?php
                                     try {
-                                        $users = $dbh->prepare('SELECT * FROM users');
-                                        $users->execute(array());
+                                        $users = $dbh->prepare('SELECT * FROM users WHERE Role = ?');
+                                        $users->execute(array(3));
 
                                         while ($user = $users->fetch()) {
                                             echo '<tr>';
