@@ -16,10 +16,13 @@ if (isset($_GET['id_serie']) && !empty($_GET['id_serie'])) {
     if ($verif_serie_exist->rowCount() > 0) {
         $series_infos = $verif_serie_exist->fetch();
         try {
-            $usersQuery = $dbh->prepare('SELECT *,u.ID_User as ID_User_User FROM users u LEFT JOIN autorisations_series a ON u.ID_User = a.ID_User AND a.ID_Serie = ? WHERE u.Role = ?');
-
-            $usersQuery->execute(array($id_serie, 3));
-
+            if ($_SESSION['ID_Role'] == 1) {
+                $usersQuery = $dbh->prepare('SELECT *,u.ID_User as ID_User_User FROM users u LEFT JOIN autorisations_series a ON u.ID_User = a.ID_User AND a.ID_Serie = ? WHERE u.Role = ?');
+                $usersQuery->execute(array($id_serie, 3));
+            } else {
+                $usersQuery = $dbh->prepare('SELECT *,u.ID_User as ID_User_User FROM users u JOIN users_liaison ul ON u.ID_User = ul.ID_User_Patient  LEFT JOIN autorisations_series a ON u.ID_User = a.ID_User AND a.ID_Serie = ? WHERE u.Role = ? AND ul.ID_User_Docteur = ?');
+                $usersQuery->execute(array($id_serie, 3,$_SESSION['ID_User']));
+            }
             $usersWithAuthorization = $usersQuery->fetchAll();
 
             // Utilisez la fonction array_filter pour obtenir directement les utilisateurs avec autorisation

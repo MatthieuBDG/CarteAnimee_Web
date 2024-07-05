@@ -3,7 +3,6 @@ require 'include/connexion_bdd.php';
 
 require 'include/verif_user_connect.php';
 
-require 'include/verif_user_admin.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -48,16 +47,24 @@ require 'include/verif_user_admin.php';
                                     <tr>
                                         <th>Prenom & Nom</th>
                                         <th>Adresse Email</th>
+                                        <?php if ($_SESSION['ID_Role'] == 1) { ?>
+                                            <th>Docteur associé</th>
+                                        <?php  } ?>
                                         <th>Rôle associé</th>
+
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
                                     try {
-                                        $users = $dbh->prepare('SELECT * FROM users');
-                                        $users->execute(array());
-
+                                        if ($_SESSION['ID_Role'] == 1) {
+                                            $users = $dbh->prepare('SELECT * FROM users ORDER BY Role');
+                                            $users->execute(array());
+                                        } else {
+                                            $users = $dbh->prepare('SELECT * FROM users u, users_liaison ul WHERE u.ID_User = ul.ID_User_Patient AND ID_User_Docteur = ? ORDER BY Role');
+                                            $users->execute(array($_SESSION['ID_User']));
+                                        }
                                         while ($user = $users->fetch()) {
                                             echo '<tr>';
                                             echo '<td>' . $user['Prenom'] . ' ' . $user['Nom'] . '</td>';
@@ -70,8 +77,29 @@ require 'include/verif_user_admin.php';
                                                 echo "Erreur!: " . $e->getMessage() . "<br/>";
                                                 die();
                                             }
+                                            if ($user['Role'] == 3) {
+                                                try {
+                                                    $req_docteur_associee = $dbh->prepare("SELECT ID_User_Docteur FROM users u, users_liaison ul WHERE u.ID_User = ul.ID_User_Patient AND ID_User = ?");
+                                                    $req_docteur_associee->execute(array($user['ID_User']));
+                                                    $req_docteur_associee = $req_docteur_associee->fetch();
+                                                } catch (PDOException $e) {
+                                                    echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                    die();
+                                                }
+                                                try {
+                                                    $req_docteur_associee2 = $dbh->prepare("SELECT Prenom,Nom FROM users WHERE ID_User = ?");
+                                                    $req_docteur_associee2->execute(array($req_docteur_associee['ID_User_Docteur']));
+                                                    $req_docteur_associee2 = $req_docteur_associee2->fetch();
+                                                } catch (PDOException $e) {
+                                                    echo "Erreur!: " . $e->getMessage() . "<br/>";
+                                                    die();
+                                                }
+                                                echo '<td>' . $req_docteur_associee2['Prenom'] . ' ' . $req_docteur_associee2['Nom'] . '</td>';
+                                            }else{
+                                                echo '<td></td>';
+                                            }
+                                            
                                             echo '<td>' . $req_recup_role['Nom'] . '</td>';
-
                                             echo '<td>';
                                             echo '<a href="modifierutilisateur?id_utilisateur=' . $user['ID_User'] . '" class="btn btn-primary btn-sm me-2">Modifier</a>';
                                             if ($_SESSION['ID_User'] <> $user['ID_User']) {

@@ -52,9 +52,13 @@ require 'include/verif_user_connect.php';
                                 <tbody>
                                     <?php
                                     try {
-                                        $users = $dbh->prepare('SELECT * FROM users WHERE Role = ?');
-                                        $users->execute(array(3));
-
+                                        if ($_SESSION['ID_Role'] == 1) {
+                                            $users = $dbh->prepare('SELECT * FROM users WHERE Role = ?');
+                                            $users->execute(array(3));
+                                        } else {
+                                            $users = $dbh->prepare('SELECT * FROM users u, users_liaison ul WHERE u.ID_User = ul.ID_User_Patient AND ID_User_Docteur = ?');
+                                            $users->execute(array($_SESSION['ID_User']));
+                                        }
                                         while ($user = $users->fetch()) {
                                             echo '<tr>';
                                             try {

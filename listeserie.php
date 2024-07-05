@@ -62,8 +62,18 @@ require 'include/verif_user_connect.php';
                                             echo '<tr>';
                                             echo '<td>' . $serie['Nom'] . '</td>';
                                             try {
-                                                $series_user_autorise = $dbh->prepare('SELECT ID_User FROM autorisations_series WHERE ID_Serie = ?');
-                                                $series_user_autorise->execute(array($serie['ID_Serie']));
+                                                if ($_SESSION['ID_Role'] == 1) {
+                                                    $series_user_autorise = $dbh->prepare('SELECT ID_User FROM autorisations_series WHERE ID_Serie = ?');
+                                                    $series_user_autorise->execute(array($serie['ID_Serie']));
+                                                } else {
+                                                    $series_user_autorise = $dbh->prepare('SELECT u.ID_User FROM autorisations_series a,users u, users_liaison ul 
+                                                    WHERE u.ID_User = a.ID_User 
+                                                    AND u.ID_User = ul.ID_User_Patient
+                                                    AND ID_Serie = ?
+                                                    AND ID_User_Docteur = ?');
+                                                    $series_user_autorise->execute(array($serie['ID_Serie'], $_SESSION['ID_User']));
+                                                }
+
                                                 $series_user_autorise_count = $series_user_autorise->rowCount();
 
                                                 echo '<td>';

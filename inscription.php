@@ -8,11 +8,16 @@
 require 'include/connexion_bdd.php';
 
 require 'include/verif_user_connect.php';
-require 'include/verif_user_admin.php';
 
 try {
-    $roles = $dbh->prepare('SELECT * FROM roles');
-    $roles->execute(array());
+
+    if ($_SESSION['ID_Role'] == 1) {
+        $roles = $dbh->prepare('SELECT * FROM roles');
+        $roles->execute(array());
+    } else {
+        $roles = $dbh->prepare('SELECT * FROM roles WHERE ID_Role = ?');
+        $roles->execute(array(3));
+    }
 } catch (PDOException $e) {
     echo "Erreur!: " . $e->getMessage() . "<br/>";
     die();
@@ -39,6 +44,12 @@ if (isset($_POST['submit'])) {
                             try {
                                 $insertnewuser = $dbh->prepare('INSERT INTO users(Prenom,Nom,Email,Mdp,Role) VALUES (?,?,?,?,?)');
                                 $insertnewuser->execute(array($prenom, $nom, $email, $passwordhash, $role));
+                                
+                                $id_patient = $dbh->lastInsertId();
+
+                                $insertnewuserliaison = $dbh->prepare('INSERT INTO users_liaison(ID_User_Patient,ID_User_Docteur) VALUES (?,?)');
+                                $insertnewuserliaison->execute(array($id_patient, $_SESSION['ID_User']));
+
                                 $success = 'L\'utilisateur ' . $prenom . ' ' . $nom . ' à bien été crée';
                                 header('Location: ./listeutilisateur?message=' . $success);
                             } catch (PDOException $e) {
@@ -88,16 +99,16 @@ if (isset($_POST['submit'])) {
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">
-                    <h1 class="mt-4">Ajouter une utilisateur</h1>
+                    <h1 class="mt-4">Ajouter un utilisateur</h1>
                     <ol class="breadcrumb mb-4">
                         <li class="breadcrumb-item">Pages</li>
                         <li class="breadcrumb-item"><a href="listeutilisateur">Liste des Utilisateurs</li></a>
-                        <li class="breadcrumb-item active">Ajouter une utilisateur</li>
+                        <li class="breadcrumb-item active">Ajouter un utilisateur</li>
                     </ol>
                     <div class="row justify-content-center">
                         <div class="col-lg-7">
                             <div class="card-header">
-                                <h3 class="text-center font-weight-light my-4">Ajouter une utilisateur</h3>
+                                <h3 class="text-center font-weight-light my-4">Ajouter un utilisateur</h3>
                             </div>
                             <div class="card-body">
                                 <?php

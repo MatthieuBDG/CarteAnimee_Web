@@ -9,12 +9,18 @@ require 'include/connexion_bdd.php';
 
 require 'include/verif_user_connect.php';
 
-require 'include/verif_user_admin.php';
 
 if (isset($_GET['id_utilisateur']) && !empty($_GET['id_utilisateur'])) {
     $id_utilisateur = $_GET['id_utilisateur'];
-    $verif_utilisateur_exist = $dbh->prepare('SELECT * FROM users WHERE ID_User = ?');
-    $verif_utilisateur_exist->execute(array($id_utilisateur));
+
+    if ($_SESSION['ID_Role'] == 1) {
+        $verif_utilisateur_exist = $dbh->prepare('SELECT * FROM users WHERE ID_User = ?');
+        $verif_utilisateur_exist->execute(array($id_utilisateur));
+    } else {
+        $verif_utilisateur_exist = $dbh->prepare('SELECT * FROM users u ,users_liaison ul WHERE ID_User = ? AND u.ID_User = ul.ID_User_Patient AND ID_User_Docteur = ?');
+        $verif_utilisateur_exist->execute(array($id_utilisateur, $_SESSION['ID_User']));
+    }
+
     if ($verif_utilisateur_exist->rowCount() > 0) {
         $utilisateurs_infos = $verif_utilisateur_exist->fetch();
         try {
@@ -27,6 +33,23 @@ if (isset($_GET['id_utilisateur']) && !empty($_GET['id_utilisateur'])) {
         try {
             $roles_utilisateur = $dbh->prepare('SELECT * FROM roles WHERE ID_Role = ?');
             $roles_utilisateur->execute(array($utilisateurs_infos['Role']));
+        } catch (PDOException $e) {
+            echo "Erreur!: " . $e->getMessage() . "<br/>";
+            die();
+        }
+
+        try {
+            $usersQuery = $dbh->prepare('SELECT * FROM users WHERE Role = ? AND ID_User <> ?');
+            $usersQuery->execute(array(2, $_SESSION['ID_User']));
+
+            $usersWithAuthorization = $usersQuery->fetchAll();
+
+            // Utilisez la fonction array_filter pour obtenir directement les utilisateurs avec autorisation
+            $usersaffectes = array_filter($usersWithAuthorization, function ($user) {
+                return !empty($user['ID_User']);
+            });
+
+            // Maintenant, vous pouvez utiliser $usersWithAuthorization, $usersAffected et $usersDeaffected comme nécessaire
         } catch (PDOException $e) {
             echo "Erreur!: " . $e->getMessage() . "<br/>";
             die();
@@ -65,7 +88,23 @@ if (isset($_POST['submitmdp'])) {
         $erreur = "Tous les champs doivent être complétés";
     }
 }
+if (isset($_POST['submitdeaffectation'])) {
+    $usersaffecte = htmlspecialchars($_POST['usersaffecte']);
 
+    if (!empty($usersaffecte) && isset($usersaffecte)) {
+        try {
+            $updateaffectiondocteur = $dbh->prepare('UPDATE users_liaison SET ID_User_Docteur = ? WHERE ID_User_Patient = ?');
+            $updateaffectiondocteur->execute(array($usersaffecte, $id_utilisateur));
+            $success = 'L\'utilisateur ' . $prenom . ' ' . $nom . ' à bien été modifié !';
+            header('Location: ./listeutilisateur?message=' . $success);
+        } catch (PDOException $e) {
+            echo "Erreur!: " . $e->getMessage() . "<br/>";
+            die();
+        }
+    } else {
+        $erreur = "Tous les champs doivent être complétés";
+    }
+}
 if (isset($_POST['submit'])) {
     $nom = htmlspecialchars($_POST['nom']);
     $prenom = htmlspecialchars($_POST['prenom']);
@@ -198,7 +237,7 @@ if (isset($_POST['submit'])) {
                                     </div>
                                 </div>
                             </div>
-                            <div class="card mt-3 mb-5">
+                            <div class="card mt-3">
                                 <div class="card-header">
                                     Mot de passe
                                 </div>
@@ -224,9 +263,39 @@ if (isset($_POST['submit'])) {
                                 </div>
                             </div>
                         </div>
+                        <div class="card mt-3 mb-5">
+                            <div class="card-header">
+                                Affecté un Enfants/Parents à un autre docteur
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <form method="post">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="form-floating mb-3">
+                                                        <select class="form-control" name="usersaffecte" required>
+                                                            <?php foreach ($usersaffectes as $usersaffecte) { ?>
+                                                                <option value="<?php echo $usersaffecte['ID_User']; ?>"><?php echo $usersaffecte['Prenom'] . ' ' . $usersaffecte['Nom'] ?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                        <label>Docteur*</label>
+                                                    </div>
+                                                    <div class="mt-4 mb-0">
+                                                        <input type="submit" name="submitdeaffectation" class="btn btn-primary" value="Enregistrer">
+                                                    </div>
+
+                                                </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
         </div>
+    </div>
+    </div>
 
     </div>
     </div>

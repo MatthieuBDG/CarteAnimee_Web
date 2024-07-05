@@ -3,7 +3,7 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Pages</div>
-                <?php if (!isset($_SESSION['ID_Role']) || $_SESSION['ID_Role'] == 1) { ?>
+                <?php if (!isset($_SESSION['ID_Role']) || isset($_SESSION['ID_Role'])) { ?>
                     <a class="nav-link collapsed" data-bs-toggle="collapse" data-bs-target="#collapseCompte" aria-expanded="false" aria-controls="collapseCompte">
                         <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                         Gestion de comptes
@@ -14,7 +14,8 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <?php if (!isset($_SESSION['ID_User'])) { ?>
                             <a class="nav-link" href="connexion">Connexion</a>
-                        <?php } elseif (!isset($_SESSION['ID_Role']) || $_SESSION['ID_Role'] == 1) { ?>
+                            <?php } elseif (!isset($_SESSION['ID_Role']) || isset($_SESSION['ID_Role'])) { ?>
+
                             <a class="nav-link" href="listeutilisateur">Liste des utilisateurs</a>
                             <a class="nav-link" href="inscription">Ajout d'un utilisateur</a>
 
