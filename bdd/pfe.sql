@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `users_liaison` (
 --
 
 INSERT INTO `users` (`ID_User`, `Prenom`, `Nom`, `Email`, `Mdp`, `Role`) VALUES
-(1, 'Zeus', 'le dieu', 'A@gmail.com', '$2y$10$h2GIkGL0La0aHsODYnjvAezKEyd/rjIAYTK1QlV1.9r.WygKSuQXu', 1);
+(1, 'Admin', 'PFE', 'A@gmail.com', '$2y$10$h2GIkGL0La0aHsODYnjvAezKEyd/rjIAYTK1QlV1.9r.WygKSuQXu', 1);
 --
 -- Contraintes pour la table `avancement_series`
 --

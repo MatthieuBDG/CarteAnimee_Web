@@ -15,6 +15,8 @@ if (isset($_GET['id_animation']) && !empty($_GET['id_animation'])) {
     $verif_animation_exist->execute(array($id_animation));
     if ($verif_animation_exist->rowCount() > 0) {
         $animation_infos = $verif_animation_exist->fetch();
+        $cheminGifReel = $animation_infos['Chemin_Gif_Reel'];
+        $cheminGifFictif = $animation_infos['Chemin_Gif_Fictif'];
     } else {
         $error = 'Le numéro de l\'animation n\'est pas valide ou n\'existe pas';
         header('Location: ./listeanimation?messageerror=' . $error);
@@ -25,11 +27,12 @@ if (isset($_GET['id_animation']) && !empty($_GET['id_animation'])) {
 }
 if (isset($_POST['submit'])) {
     try {
-        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif = ? AND ID_Animation != ?');
-        $verif_gif_usage->execute(array($animation_infos['Chemin_Gif'], $id_animation));
+        $verif_gif_usage = $dbh->prepare('SELECT * FROM animations WHERE Chemin_Gif_Reel = ? AND Chemin_Gif_Fictif = ? AND ID_Animation != ?');
+        $verif_gif_usage->execute(array($cheminGifReel,$cheminGifFictif, $id_animation));
         if ($verif_gif_usage->rowCount() == 0) {
             try {
-                unlink($animation_infos['Chemin_Gif']);
+                unlink($cheminGifReel);
+                unlink($cheminGifFictif);
             } catch (PDOException $e) {
                 echo "Erreur!: " . $e->getMessage() . "<br/>";
                 die();
@@ -132,7 +135,7 @@ if (isset($_POST['submit'])) {
                                                 <div class="col-md-6">
                                                     <div class="card">
                                                         <div class="card-body">
-                                                            <img src="<?php echo $animation_infos['Chemin_Gif']; ?>" alt="Gif de l'animation" class="rounded img-fluid" />
+                                                            <img src="<?php echo $cheminGifReel; ?>" alt="Gif de l'animation" class="rounded img-fluid" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -143,6 +146,13 @@ if (isset($_POST['submit'])) {
                                                                 <source src="<?php echo $animation_infos['Chemin_Audio']; ?>" type="audio/mpeg">
                                                                 Your browser does not support the audio tag.
                                                             </audio>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <img src="<?php echo $cheminGifFictif; ?>" alt="Gif de l'animation" class="rounded img-fluid" />
                                                         </div>
                                                     </div>
                                                 </div>

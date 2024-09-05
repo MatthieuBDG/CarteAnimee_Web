@@ -39,6 +39,13 @@ if (isset($_POST['submit'])) {
         die();
     }
     try {
+        $deleteseries_animations = $dbh->prepare('DELETE FROM avancement_series WHERE ID_Serie = ?');
+        $deleteseries_animations->execute(array($id_serie));
+    } catch (PDOException $e) {
+        echo "Erreur!: " . $e->getMessage() . "<br/>";
+        die();
+    }
+    try {
         $deleteserie = $dbh->prepare('DELETE FROM series WHERE ID_Serie = ?');
         $deleteserie->execute(array($id_serie));
     } catch (PDOException $e) {
